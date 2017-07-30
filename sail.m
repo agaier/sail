@@ -42,11 +42,27 @@ function [output] = sail(p)
 
 %------------- BEGIN CODE --------------
 
-if nargin==0; output = defaultParamSet; return; end;
+if nargin==0; output = defaultParamSet; return; end
+
+%% Domain parameter (temporary)
+d.initialize = 'af_InitialSamples';
+d.dof = 10;
+d.express = p.express;
+d.base = p.base;
+d.preciseEvalFunction = p.preciseEvalFunction;
+
+d.gpParams(1)= paramsGP(d.dof); % Drag
+d.gpParams(2)= paramsGP(d.dof); % Lift
+d.createAcqFunction= 'af_CreateAcqFunc';
+d.varCoef = p.varCoef;
+d.muCoef = p.muCoef;
+
+d.featureRes = p.featureRes;
+
 
 %% 0 - Produce Initial Samples
-[inputSamples, cD, cL] = af_InitialSamples(p);
-nSamples = size(inputSamples,1);
+[observation, value] = feval(d.initialize,d,p.nInitialSamples);
+nSamples = size(observation,1);
 
 %% Acquisition Loop
 % 1) Surrogate models are created from all evaluated samples, and these
@@ -72,32 +88,32 @@ while nSamples <= p.nTotalSamples
     
     %% 1 - Create Surrogate and Acquisition Function
     disp(['PE ' int2str(nSamples) ' | Training Surrogate Models']);
-    [gpDrag, gpLift] = constructSurrogate(  inputSamples,           ...
-                                            cD, paramsGP(p.dof),    ...
-                                            cL, paramsGP(p.dof)  );
     
-                                        
-    acqFunction = @(x) computeFitness(gpDrag(x), gpLift(x), p.express(x), p); % include predicted drag and lift for analysis                                                          
+    parfor iModel = 1:size(value,2)
+       gpModel{iModel} = trainGP(observation, value(:,iModel), d.gpParams(iModel))
+    end
+    
+    acqFunction = feval(d.createAcqFunction, gpModel, d);                                         
     
     %% 2 - Initialize MAP with Initial Samples
     % Evaluate data set with acquisition function
-    [fitness,drag,lift] = acqFunction(inputSamples); % include predicted drag and lift for analysis
+    [fitness,predValues] = acqFunction(observation);
     
     % Place Best Samples in Map
-    [map, p.edges] = createMap(p);
-    [replaced, replacement] = nicheCompete(inputSamples, fitness, map, p);
-    map = updateMap(replaced,replacement,map,fitness,gpDrag(inputSamples),lift,inputSamples);
+    [obsMap, p.edges] = createMap(d.featureRes, d.dof);
+    [replaced, replacement] = nicheCompete(observation, fitness, obsMap, p);
+    obsMap = updateMap(replaced,replacement,obsMap,fitness,observation);
     
     if p.display.figs
         figure(1);subplot(10,2,12:2:18);
-        viewMap(map.fitness,p);        
+        viewMap(obsMap.value,p);        
         colormap(parula(16)); caxis(gca,[-5.4 0]);
         title('Best PE Fitness Samples');
     end
     
     %% 3 - Illuminate Acquisition Map
     disp(['PE: ' int2str(nSamples) '| Illuminating Acquisition Map']);
-    acqMap = mapElites(acqFunction,map,p);
+    acqMap = mapElites(acqFunction,obsMap,p);
     
     % View Acquisition Map and Drag Predictions
     if p.display.figs
@@ -132,7 +148,7 @@ while nSamples <= p.nTotalSamples
         p.varCoef = previousVarCoef;        p.muCoef = previousMuCoef;
         
         disp(['PE: ' int2str(nSamples) '| Illuminating Prediction Map']);
-        predMap = mapElites(predFunction,map,p);
+        predMap = mapElites(predFunction,obsMap,p);
         if p.display.figs
             figure(3); 
             if p.data.mapEval; subplot(2,1,1); end;
@@ -151,7 +167,7 @@ while nSamples <= p.nTotalSamples
         end
         
         % Maps
-        output.map = map;            
+        output.map = obsMap;            
         output.acqMap = acqMap;
         output.predMap = predMap;
         output.mapTrue = mapTrue;
@@ -246,7 +262,7 @@ while nSamples <= p.nTotalSamples
     if p.display.figs
         figure(1);
         subplot(10,2,12:2:18);
-        viewMap(map.fitness,p);
+        viewMap(obsMap.fitness,p);
         colormap(parula(16));caxis([-5.4 0]);
         title('Precisely Evaluated Samples')
         

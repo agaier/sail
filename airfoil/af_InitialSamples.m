@@ -1,24 +1,24 @@
-function [initialSamples, cD, cL] = af_InitialSamples(p)
+function [observation, value] = af_InitialSamples(d,nInitialSamples)
 %af_InitialSamples - Produces initial airfoil samples
 % Initial samples are produced using a Sobol sequence to evenly sample the
 % parameter space. If initial samples are invalid (invalid geometry, or did
 % not converge in simulator), the next sample in the Sobol sequence is
 % chosen. Lather, rinse, repeat until all initial samples are clean.
 %
-% Syntax:  [inputSamples, cD, cL] = af_InitialSamples(p);
+% Syntax:  [observation, value] = af_InitialSamples(p)
 %
 % Inputs:
-%    p - SAIL hyperparameter struct
-%       .nInitialSamples
+%    d - domain description struct
 %       .preciseEvalFunction
 %       .express
 %       .base.area
 %       .base.lift
+%    nInitialSamples - initial samples to produce
 %
 % Outputs:
-%    initialSamples - [nInitialSamples X nParameters]
-%    cD             - coefficient of drag (measured)
-%    cL             - coefficient of lift (measured)
+%    observation - [nInitialSamples X nParameters]
+%    value(:,1)  - [nInitialSamples X 1] cD (coefficient of drag)
+%    value(:,2)  - [nInitialSamples X 1] cL (coefficient of lift)
 %
 % Other m-files required: none
 % Subfunctions: none
@@ -35,14 +35,14 @@ function [initialSamples, cD, cL] = af_InitialSamples(p)
 
 % Produce initial solutions
 inputSobSet  = scramble(sobolset(10,'Skip',1e3),'MatousekAffineOwen');
-inputSobCounter = p.nInitialSamples;
+inputSobCounter = nInitialSamples;
 initialSamples = inputSobSet(1:inputSobCounter,:);
-cD = nan(p.nInitialSamples,1); cL = cD;
+cD = nan(nInitialSamples,1); cL = cD;
 
 % Evaluate initial solutions
-parfor iFoil = 1:p.nInitialSamples
-    [~,cD(iFoil,1), cL(iFoil,1),~] = feval(p.preciseEvalFunction,...
-        initialSamples(iFoil,:), p.express,p.base.area,p.base.lift); %#ok<PFBNS>
+parfor iFoil = 1:nInitialSamples
+    [~,cD(iFoil,1), cL(iFoil,1),~] = feval(d.preciseEvalFunction,...
+        initialSamples(iFoil,:), d.express,d.base.area,d.base.lift); %#ok<PFBNS>
 end
 
 % Identify, Reselect, Reevaluate invalid solutions
@@ -51,7 +51,7 @@ while any(isnan(cD))
     disp([int2str(sum(nNans)) ' NaN values']);
     
     % Identify
-    nanIndx = 1:p.nInitialSamples;
+    nanIndx = 1:nInitialSamples;
     nanIndx = nanIndx(isnan(cD));
     
     % Reselect
@@ -61,8 +61,8 @@ while any(isnan(cD))
     % Reevaluate
     newCd = nan(nNans,1);newCl = nan(nNans,1);
     parfor i = 1:nNans
-        [~,newCd(i), newCl(i),~] = feval(p.preciseEvalFunction,...
-            nanGenes(i,:), p.express,p.base.area,p.base.lift); %#ok<PFBNS>
+        [~,newCd(i), newCl(i),~] = feval(d.preciseEvalFunction,...
+            nanGenes(i,:), d.express,d.base.area,d.base.lift); %#ok<PFBNS>
     end
     
     % Use parfor data
@@ -70,4 +70,8 @@ while any(isnan(cD))
     cL(nanIndx) = newCl;
     initialSamples(nanIndx,:) = nanGenes;
 end
+
+observation = initialSamples;
+value(:,1) = cD;
+value(:,2) = cL;
 %------------- END OF CODE --------------
