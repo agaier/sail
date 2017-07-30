@@ -1,4 +1,4 @@
-function [map, edges] = createMap(varargin)
+function [map, edges] = createMap(featureResolution, genomeLength, varargin)
 %createMap - Defines map struct and feature space cell divisions
 %
 % Syntax:  [map, edges] = createMap(featureResolution, genomeLength)
@@ -30,13 +30,6 @@ function [map, edges] = createMap(varargin)
 % Jun 2016; Last revision: 27-Jan-2017
 
 %------------- BEGIN CODE --------------
-if nargin == 1
-    featureResolution   = varargin{1}.featureRes;
-    genomeLength        = varargin{1}.genomeLength ;
-else
-    featureResolution   = varargin{1};
-    genomeLength        = varargin{2} ;
-end
 
 for i=1:length(featureResolution)
     edges{i} = linspace(0,1,featureResolution(i)+1); %#ok<AGROW>
@@ -45,13 +38,13 @@ map.edges = edges;
 
 blankMap     = NaN(featureResolution,'double');
 map.fitness  = blankMap;
-map.dragMean = blankMap; 
-map.dragS2   = blankMap;
-map.liftMean = blankMap; 
-map.liftS2   = blankMap; 
 map.genes    = repmat(blankMap,[1 1 genomeLength]); %#ok<REPMAT>
-    
-% map.genes    = cell(featureResolution); % If genome is not static vector
+
+if ~isempty(varargin)
+    for iValues = 1:length(varargin{1})
+        eval(['map.' varargin{1}{iValues} ' = blankMap;']);
+    end
+end
 
 
 

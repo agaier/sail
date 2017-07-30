@@ -1,4 +1,5 @@
-function map = updateMap(replaced,replacement,map,fitness,drag,lift,children)
+function map = updateMap(replaced,replacement,map,...
+                            fitness,genes,values,extraMapValues)
 %updateMap - Replaces all values in a set of map cells
 %
 % Syntax:  map = updateMap(replaced,replacement,map,fitness,drag,lift,children)
@@ -29,23 +30,24 @@ function map = updateMap(replaced,replacement,map,fitness,drag,lift,children)
 % Jun 2016; Last revision: 07-Jun-2016
 
 %------------- BEGIN CODE --------------
+
+% Assign Fitness
 map.fitness (replaced) = fitness (replacement);
-map.dragMean(replaced) = drag    (replacement,1);
-map.liftMean(replaced) = lift    (replacement,1);
 
-if size(drag,2) > 1
-    map.liftS2  (replaced) = lift    (replacement,2);
-    map.dragS2  (replaced) = drag    (replacement,2);
-end
-
-% Assign gene arrays
+% Assign Genomes
 [r,c] = size(map.fitness);
 [replacedI,replacedJ] = ind2sub([r c], replaced);
 for iReplace = 1:length(replaced)
     map.genes(replacedI(iReplace),replacedJ(iReplace),:) = ...
-        children(replacement(iReplace),:) ;    
+        genes(replacement(iReplace),:) ;    
 end
 
+% Assign Miscellaneous Map values
+if ~isempty(extraMapValues)
+    for iValues = 1:length(extraMapValues)
+        eval(['map.' extraMapValues{iValues} '(replaced) = values{' int2str(iValues) '}(replacement);']);
+    end
+end
 
 
 %------------- END OF CODE --------------

@@ -58,6 +58,7 @@ d.varCoef = p.varCoef;
 d.muCoef = p.muCoef;
 
 d.featureRes = p.featureRes;
+d.extraMapValues = {'cD','cL'};
 
 
 %% 0 - Produce Initial Samples
@@ -100,9 +101,10 @@ while nSamples <= p.nTotalSamples
     [fitness,predValues] = acqFunction(observation);
     
     % Place Best Samples in Map
-    [obsMap, p.edges] = createMap(d.featureRes, d.dof);
+    [obsMap, p.edges] = createMap(d.featureRes, d.dof, d.extraMapValues);
     [replaced, replacement] = nicheCompete(observation, fitness, obsMap, p);
-    obsMap = updateMap(replaced,replacement,obsMap,fitness,observation);
+    obsMap = updateMap(replaced,replacement,obsMap,fitness,observation,...
+                        predValues,d.extraMapValues);
     
     if p.display.figs
         figure(1);subplot(10,2,12:2:18);
