@@ -1,4 +1,4 @@
-function [map, h] = mapElites(fitnessFunction,map,p, varargin)
+function [map, h] = mapElites(fitnessFunction,map,p,d,varargin)
 %mapElites - Multi-dimensional Archive of Phenotypic Elites algorithm
 %
 % Syntax:  map = mapElites(fitnessFunction, map, p);
@@ -37,15 +37,16 @@ while (iGen < p.nGens)
     children = [];
     while size(children,1) < p.nChildren
         newChildren = createChildren(map,p);
-        validInds = validateChildren(newChildren,p);
-        children = [children ;newChildren(validInds,:)] ; %#ok<AGROW>
+        validInds = feval(d.validate,newChildren,d);
+        children = [children ; newChildren(validInds,:)] ; %#ok<AGROW>
     end
     children = children(1:p.nChildren,:);
-    [fitness, drag, lift] = fitnessFunction(children);
+    [fitness, values] = fitnessFunction(children);
 
     %% Add Children to Map   
     [replaced, replacement] = nicheCompete(children,fitness,map,p);
-    map = updateMap(replaced,replacement,map,fitness,drag,lift,children);  
+    map = updateMap(replaced,replacement,map,fitness,children,...
+                        values,d.extraMapValues);  
                        
     %% View New Map
     if p.display.illu && ~mod(iGen,p.display.illuMod)

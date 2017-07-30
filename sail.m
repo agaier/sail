@@ -60,6 +60,11 @@ d.muCoef = p.muCoef;
 d.featureRes = p.featureRes;
 d.extraMapValues = {'cD','cL'};
 
+d.validate = 'af_ValidateChildren';
+
+%% Testing Parameters
+p.nGens = 100;
+
 
 %% 0 - Produce Initial Samples
 [observation, value] = feval(d.initialize,d,p.nInitialSamples);
@@ -88,104 +93,34 @@ nSamples = size(observation,1);
 while nSamples <= p.nTotalSamples
     
     %% 1 - Create Surrogate and Acquisition Function
-    disp(['PE ' int2str(nSamples) ' | Training Surrogate Models']);
-    
+    disp(['PE ' int2str(nSamples) ' | Training Surrogate Models']); 
     parfor iModel = 1:size(value,2)
        gpModel{iModel} = trainGP(observation, value(:,iModel), d.gpParams(iModel))
     end
-    
     acqFunction = feval(d.createAcqFunction, gpModel, d);                                         
     
     %% 2 - Initialize MAP with Initial Samples
     % Evaluate data set with acquisition function
     [fitness,predValues] = acqFunction(observation);
     
-    % Place Best Samples in Map
+    % Place Best Samples in Map with Predicted Fitness
     [obsMap, p.edges] = createMap(d.featureRes, d.dof, d.extraMapValues);
     [replaced, replacement] = nicheCompete(observation, fitness, obsMap, p);
     obsMap = updateMap(replaced,replacement,obsMap,fitness,observation,...
                         predValues,d.extraMapValues);
-    
-    if p.display.figs
-        figure(1);subplot(10,2,12:2:18);
-        viewMap(obsMap.value,p);        
-        colormap(parula(16)); caxis(gca,[-5.4 0]);
-        title('Best PE Fitness Samples');
-    end
-    
+       
     %% 3 - Illuminate Acquisition Map
     disp(['PE: ' int2str(nSamples) '| Illuminating Acquisition Map']);
-    acqMap = mapElites(acqFunction,obsMap,p);
-    
-    % View Acquisition Map and Drag Predictions
-    if p.display.figs
-        figure(1);
-        subplot(10,2,1:2:8);
-        viewMap(acqMap.fitness,p);
-        title('Acquisition Map'); %  caxis([-5.5 0])
-        subplot(10,2,2:2:8);
-        viewMap(acqMap.dragMean,p); colormap(parula(16));
-        title('Drag Mean (\mu)'); % caxis([0 1.5]);
-        subplot(10,2,11:2:18);
-        viewMap(sqrt(acqMap.dragS2),p);colormap(parula(16));
-        title('Drag Uncertainty (\sigma)') % caxis([0 0.5])
-    end
-    
-    
+    acqMap = mapElites(acqFunction,obsMap,p,d);
+
     %% 3.2 - Save data for Analysis
-    if (nSamples == p.nTotalSamples)  ...                   % @End
-    || ~mod((nSamples-p.nInitialSamples), p.data.outMod)    % @Interval
-                                
-        % Known Samples
-        output.cD = cD;              output.cL = cL; 
-        output.fitness = fitness;    output.inputSamples = inputSamples;
-        
-        % Surrogate Models        
-        output.gpDrag = gpDrag;      output.gpLift = gpLift;
-        
-        % Illuminate without exploration reward to produce Prediction Map
-        previousVarCoef = p.varCoef;  previousMuCoef = p.muCoef;
-        p.varCoef = 0;                      p.muCoef = 1;
-        predFunction = @(x) computeFitness(gpDrag(x), gpLift(x), p.express(x), p); % include predicted drag and lift for analysis                                                          
-        p.varCoef = previousVarCoef;        p.muCoef = previousMuCoef;
-        
-        disp(['PE: ' int2str(nSamples) '| Illuminating Prediction Map']);
-        predMap = mapElites(predFunction,obsMap,p);
-        if p.display.figs
-            figure(3); 
-            if p.data.mapEval; subplot(2,1,1); end;
-            viewMap(predMap.fitness,p);
-            title('Prediction Map'); colormap(parula(16));caxis([-5.4 0]);
-        end
-        
-        % Evaluate all individuals in prediction map
-        mapTrue = [];
-        if p.data.mapEval && ~mod(nSamples,p.data.mapEvalMod)
-            disp(['PE ' int2str(nSamples) ' | Evaluating Prediction Map']);
-            mapTrue = evaluateMap(predMap,p);   
-            figure(3); subplot(2,1,2)
-            viewMap(mapTrue.fitness,p);
-            title('True Fitness'); colormap(parula(16));caxis([-5.4 0]);
-        end
-        
-        % Maps
-        output.map = obsMap;            
-        output.acqMap = acqMap;
-        output.predMap = predMap;
-        output.mapTrue = mapTrue;
-        
-        % Parameters
-        output.p = p;         
-        
-        save([p.data.outPath 'pe' digitInt2str(nSamples,3) '.mat'], 'output')
-    end
-    
+     %feval(d.saveData);
+
     %% 4 - Select Infill Samples
     if nSamples == p.nInitialSamples    % Initialize sobol sequence for sample selection
         sobSet  = scramble(sobolset(p.nDims,'Skip',1e3),'MatousekAffineOwen');
         sobPoint= 1;
     end
-    
     
     if nSamples == p.nTotalSamples; break; else % On Final illumination, no infill
         %%
@@ -196,93 +131,35 @@ while nSamples <= p.nTotalSamples
         mapLinIndx = sobol2indx(sobSet,newSampleRange,p);
         sobPoint = sobPoint + length(newSampleRange);
         
-        emptyCells = isnan(acqMap.fitness(mapLinIndx));
-        while any(emptyCells)
-            nEmptyCells = sum(emptyCells);
-            mapLinIndx(emptyCells) = ...
+        % Don't choose from empty bins
+        emptyBins = isnan(acqMap.fitness(mapLinIndx));
+        while any(emptyBins)
+            nEmptyCells = sum(emptyBins);
+            mapLinIndx(emptyBins) = ...
                 sobol2indx(sobSet,sobPoint:sobPoint+nEmptyCells-1,p);
-            emptyCells = isnan(acqMap.fitness(mapLinIndx));
+            emptyBins = isnan(acqMap.fitness(mapLinIndx));
             sobPoint = sobPoint + nEmptyCells;
         end
-        
-        % Evaluate New Samples
+                
         [r,c] = size(acqMap.fitness);
         [chosenI,chosenJ] = ind2sub([r c], mapLinIndx);
         for i=1:length(mapLinIndx)
-            newGenes(i,:) = acqMap.genes(chosenI(i),chosenJ(i),:); %#ok<AGROW>
+            nextObservations(i,:) = acqMap.genes(chosenI(i),chosenJ(i),:); %#ok<AGROW>
         end
         
-        % Parfor nonsense (splitting variables, local variables...)
-        express = p.express; baseArea = p.base.area; baseLift = p.base.lift;
-        parfor iGenes = 1:p.nAdditionalSamples
-            [~,newCd(iGenes,1),newCl(iGenes,1),~] = feval(p.preciseEvalFunction,...
-                newGenes(iGenes,:), express, baseArea, baseLift); %#ok<PFBNS>
-        end
-        
-        % If nan, take the next in the sobol set
-        while any(isnan(newCd))
-            nNans = sum(isnan(newCd));
-            nanGenes = nan(nNans,p.dof);
-            display([int2str(nNans) ' NaN values']);
-            
-            % Identify
-            nanIndx = 1:p.nAdditionalSamples;
-            nanIndx = nanIndx(isnan(newCd));
-            
-            % Replace
-            newSampleRange = sobPoint:(sobPoint+nNans-1);
-            mapLinIndx = sobol2indx(sobSet,newSampleRange,p);
-            sobPoint = sobPoint + length(newSampleRange);
-            
-            [chosenI,chosenJ] = ind2sub([r c], mapLinIndx);
-            for iGenes=1:nNans
-                nanGenes(iGenes,:) = ...
-                    acqMap.genes(chosenI(iGenes),chosenJ(iGenes),:);
-            end
-            
-            % Reevaluate
-            newCdp = nan(nNans,1);newClp = nan(nNans,1);
-            parfor i = 1:nNans
-                [~,newCdp(i), newClp(i),~] = feval(p.preciseEvalFunction,...
-                    nanGenes(i,:), express, baseArea, baseLift); %#ok<PFBNS>
-            end
-            
-            % Use parfor data
-            newCd(nanIndx)      = newCdp;
-            newCl(nanIndx)      = newClp;
-            newGenes(nanIndx,:) = nanGenes;
-        end
-        
+        % Evaluate New Samples [TODO: Clean this up]
+        acquisition.sobPoint = sobPoint; acquisition.sobSet = sobSet;
+        acquisition.acqMap = acqMap; acquisition.r = r; acquisition.c = c;
+        [newObservation, newValue, sobPoint] = af_NewSamples...
+                                    (nextObservations, d, p, acquisition)
+                                
         % Add Precise Evaluation Results to Data Set
-        cD           = cat(1,cD,newCd);
-        cL           = cat(1,cL,newCl);
-        inputSamples = cat(1,inputSamples, newGenes);
-        nSamples     = size(inputSamples,1);
+        value = cat(1,value,newValue);
+        observation = cat(1,observation,newObservation);
+        nSamples     = size(observation,1);
     end
-    
-    %% Save Plots
-    if p.display.figs
-        figure(1);
-        subplot(10,2,12:2:18);
-        viewMap(obsMap.fitness,p);
-        colormap(parula(16));caxis([-5.4 0]);
-        title('Precisely Evaluated Samples')
-        
-        subplot(60,2,[119:120]);
-        progress = zeros(1,p.nTotalSamples);progress(1:nSamples) = 1;
-        imagesc(progress); ylabel('');
-        xlabel(['Precise Evaluations: (' int2str(nSamples) ' / '  int2str(p.nTotalSamples) ')']);
-        set(gca,'YTickLabel','','YTick','','XTick','','XTickLabel', '')
-    end
-    
-    % next GIF frame
-    if p.display.gifs; drawnow; export_fig test.tif -nocrop -append; end
-    
+
 end
-
-% Finalize GIF
-if p.display.gifs;im2gif('test.tif', '-delay', 0.5, '-loops', 0);end
-
 
 output.p = p;
 end %%end function
