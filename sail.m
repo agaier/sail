@@ -50,6 +50,7 @@ d.dof = 10;
 d.express = p.express;
 d.base = p.base;
 d.preciseEvalFunction = p.preciseEvalFunction;
+d.preciseEvaluate = 'af_PreciseEvaluate';
 
 d.gpParams(1)= paramsGP(d.dof); % Drag
 d.gpParams(2)= paramsGP(d.dof); % Lift
@@ -61,6 +62,8 @@ d.featureRes = p.featureRes;
 d.extraMapValues = {'cD','cL'};
 
 d.validate = 'af_ValidateChildren';
+
+d.saveData = 'af_RecordData';
 
 %% Testing Parameters
 p.nGens = 100;
@@ -114,54 +117,53 @@ while nSamples <= p.nTotalSamples
     acqMap = mapElites(acqFunction,obsMap,p,d);
 
     %% 3.2 - Save data for Analysis
-     %feval(d.saveData);
+    %feval(d.saveData);
 
     %% 4 - Select Infill Samples
     if nSamples == p.nInitialSamples    % Initialize sobol sequence for sample selection
         sobSet  = scramble(sobolset(p.nDims,'Skip',1e3),'MatousekAffineOwen');
         sobPoint= 1;
+    end   
+    if nSamples == p.nTotalSamples; break; else % On Final illumination, no infill
+                      
+    newValue = nan(p.nAdditionalSamples, length(d.featureRes)); % new values will be stored here
+    noValue = any(isnan(newValue),2);
+    
+    while any(any(noValue))
+        nNans = sum(noValue);
+        nextGenes = nan(nNans,d.dof); % Create one 'blank' genome for each NAN
+        
+        % Identify (grab indx of NANs)
+        nanIndx = 1:p.nAdditionalSamples;
+        nanIndx = nanIndx(noValue);
+        
+        % Replace with next in Sobol Sequence
+        newSampleRange = sobPoint:(sobPoint+nNans-1);
+        mapLinIndx = sobol2indx(sobSet,newSampleRange,p);
+        [chosenI,chosenJ] = ind2sub(p.featureRes, mapLinIndx);
+        for iGenes=1:nNans % Pull out chosen genomes from map
+            nextGenes(iGenes,:) = acqMap.genes(chosenI(iGenes),chosenJ(iGenes),:);
+        end
+        
+        % Reevaluate
+        measuredValue = feval(d.preciseEvaluate, nextGenes, d);
+        
+        % Assign found values
+        newValue(nanIndx,:) = measuredValue;
+        noValue = any(isnan(newValue),2);
+        nextObservation(nanIndx,:) = nextGenes;         %#ok<AGROW>
+        sobPoint = sobPoint + length(newSampleRange);   % Increment sobol sequence for next samples
     end
     
-    if nSamples == p.nTotalSamples; break; else % On Final illumination, no infill
-        %%
-        display(['PE ' int2str(nSamples) ' | Selecting Next Samples']);
-
-        % Choose Samples for Evaluation
-        newSampleRange = sobPoint:(sobPoint+p.nAdditionalSamples-1);
-        mapLinIndx = sobol2indx(sobSet,newSampleRange,p);
-        sobPoint = sobPoint + length(newSampleRange);
-        
-        % Don't choose from empty bins
-        emptyBins = isnan(acqMap.fitness(mapLinIndx));
-        while any(emptyBins)
-            nEmptyCells = sum(emptyBins);
-            mapLinIndx(emptyBins) = ...
-                sobol2indx(sobSet,sobPoint:sobPoint+nEmptyCells-1,p);
-            emptyBins = isnan(acqMap.fitness(mapLinIndx));
-            sobPoint = sobPoint + nEmptyCells;
-        end
-                
-        [r,c] = size(acqMap.fitness);
-        [chosenI,chosenJ] = ind2sub([r c], mapLinIndx);
-        for i=1:length(mapLinIndx)
-            nextObservations(i,:) = acqMap.genes(chosenI(i),chosenJ(i),:); %#ok<AGROW>
-        end
-        
-        % Evaluate New Samples [TODO: Clean this up]
-        acquisition.sobPoint = sobPoint; acquisition.sobSet = sobSet;
-        acquisition.acqMap = acqMap; acquisition.r = r; acquisition.c = c;
-        [newObservation, newValue, sobPoint] = af_NewSamples...
-                                    (nextObservations, d, p, acquisition)
-                                
-        % Add Precise Evaluation Results to Data Set
-        value = cat(1,value,newValue);
-        observation = cat(1,observation,newObservation);
-        nSamples     = size(observation,1);
-    end
-
-end
+    % Add Precise Evaluation Results to Data Set
+    value = cat(1,value,newValue);
+    observation = cat(1,observation,nextObservation);
+    nSamples  = size(observation,1); 
+    end   
+end % end acquisition loop
 
 output.p = p;
+output.model = gpModel;
 end %%end function
 
 
