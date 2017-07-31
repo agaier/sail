@@ -1,4 +1,4 @@
-function [fitness,predValues] = af_computeFitness(drag,lift,foil,d)
+function [fitness,predValues] = af_AcquisitionFunc(drag,lift,foil,d)
 %computeFitness - Computes fitness with penalties from drag, lift, area
 %
 % Syntax:  [fitness, drag, lift] = computeFitness(drag, lift, initialFoils)

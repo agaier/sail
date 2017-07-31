@@ -33,7 +33,7 @@ function [acqFunction] = af_CreateAcqFunc(gpModel, d)
 
 %------------- BEGIN CODE --------------
 
-acqFunction = @(x) af_computeFitness(...
+acqFunction = @(x) af_AcquisitionFunc(...
                         predictGP(gpModel{1},x),... % Drag
                         predictGP(gpModel{2},x),... % Lift
                         d.express(x),...            % Area
