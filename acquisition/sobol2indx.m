@@ -1,4 +1,4 @@
-function mapLinIndx = sobol2indx(sobSet,sobPoints,p)
+function mapLinIndx = sobol2indx(sobSet,sobPoints,d,edges)
 %sobol2indx - given a point on a sobol set, returns the map linear index
 % Syntax:   mapLinIndx = sobol2indx(sobSet,sobPoint,p)
 %
@@ -24,10 +24,10 @@ function mapLinIndx = sobol2indx(sobSet,sobPoints,p)
 %------------- BEGIN CODE --------------
 
 sampleCoords = sobSet(sobPoints,:);
-sampleBin = nan(length(sobPoints),p.nDims);
-for iDim = 1:p.nDims
-    sampleBin(:,iDim) = discretize(sampleCoords(:,iDim),p.edges{iDim});
+sampleBin = nan(length(sobPoints),d.nDims);
+for iDim = 1:d.nDims
+    sampleBin(:,iDim) = discretize(sampleCoords(:,iDim),edges{iDim});
 end
-mapLinIndx = sub2ind(p.featureRes,sampleBin(:,1),sampleBin(:,2));
+mapLinIndx = sub2ind(d.featureRes,sampleBin(:,1),sampleBin(:,2));
 
 %------------- END OF CODE --------------

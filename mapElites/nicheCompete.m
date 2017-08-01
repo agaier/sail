@@ -1,4 +1,4 @@
-function [replaced, replacement] = nicheCompete(newInds,fitness,map,p)
+function [replaced, replacement] = nicheCompete(newInds,fitness,map,d)
 %nicheCompete - results of competition with map's existing elites
 %
 % Syntax:  [replaced, replacement] = nicheCompete(newInds,fitness,map,p)
@@ -27,8 +27,8 @@ function [replaced, replacement] = nicheCompete(newInds,fitness,map,p)
 % Jun 2016; Last revision: 07-Jun-2016
 
 %------------- BEGIN CODE --------------
-[bestIndex, bestBin] = getBestPerCell(newInds,fitness,p);
-mapLinIndx = sub2ind(p.featureRes,bestBin(:,1),bestBin(:,2));
+[bestIndex, bestBin] = getBestPerCell(newInds,fitness,d, map.edges);
+mapLinIndx = sub2ind(d.featureRes,bestBin(:,1),bestBin(:,2));
 
 % Compare to already existing samples
 improvement = ~(fitness (bestIndex) >= map.fitness(mapLinIndx)); % comparisons to NaN are always false

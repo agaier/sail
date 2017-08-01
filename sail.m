@@ -1,4 +1,4 @@
-function [output] = sail(p)
+function [output] = sail(d,p)
 %SAIL - Surrogate Assisted Illumination Algorithm
 % Main run script of SAIL algorithm
 %
@@ -45,29 +45,25 @@ function [output] = sail(p)
 if nargin==0; output = defaultParamSet; return; end
 
 %% Domain parameter (temporary)
-d.initialize = 'af_InitialSamples';
-d.dof = 10;
-d.express = p.express;
-d.base = p.base;
-d.preciseEvalFunction = p.preciseEvalFunction;
-d.preciseEvaluate = 'af_PreciseEvaluate';
-
-d.gpParams(1)= paramsGP(d.dof); % Drag
-d.gpParams(2)= paramsGP(d.dof); % Lift
-d.createAcqFunction= 'af_CreateAcqFunc';
-d.varCoef = p.varCoef;
-d.muCoef = p.muCoef;
-
-d.featureRes = p.featureRes;
-d.extraMapValues = {'cD','cL'};
-
-d.validate = 'af_ValidateChildren';
-
-d.saveData = 'af_RecordData';
-
-%% Testing Parameters
-p.nGens = 100;
-
+% d.initialize = 'af_InitialSamples';
+% d.dof = 10;
+% d.express = p.express;
+% d.base = p.base;
+% d.preciseEvalFunction = p.preciseEvalFunction;
+% d.preciseEvaluate = 'af_PreciseEvaluate';
+% 
+% d.gpParams(1)= paramsGP(d.dof); % Drag
+% d.gpParams(2)= paramsGP(d.dof); % Lift
+% d.createAcqFunction= 'af_CreateAcqFunc';
+% d.varCoef = p.varCoef;
+% d.muCoef = p.muCoef;
+% 
+% d.featureRes = p.featureRes;
+% d.extraMapValues = {'cD','cL'};
+% 
+% d.validate = 'af_ValidateChildren';
+% 
+% d.saveData = 'af_RecordData';
 
 %% 0 - Produce Initial Samples
 [observation, value] = feval(d.initialize,d,p.nInitialSamples);
@@ -107,8 +103,8 @@ while nSamples <= p.nTotalSamples
     [fitness,predValues] = acqFunction(observation);
     
     % Place Best Samples in Map with Predicted Fitness
-    [obsMap, p.edges] = createMap(d.featureRes, d.dof, d.extraMapValues);
-    [replaced, replacement] = nicheCompete(observation, fitness, obsMap, p);
+    obsMap = createMap(d.featureRes, d.dof, d.extraMapValues);
+    [replaced, replacement] = nicheCompete(observation, fitness, obsMap, d);
     obsMap = updateMap(replaced,replacement,obsMap,fitness,observation,...
                         predValues,d.extraMapValues);
        
@@ -121,7 +117,7 @@ while nSamples <= p.nTotalSamples
 
     %% 4 - Select Infill Samples
     if nSamples == p.nInitialSamples    % Initialize sobol sequence for sample selection
-        sobSet  = scramble(sobolset(p.nDims,'Skip',1e3),'MatousekAffineOwen');
+        sobSet  = scramble(sobolset(d.nDims,'Skip',1e3),'MatousekAffineOwen');
         sobPoint= 1;
     end   
     if nSamples == p.nTotalSamples; break; else % On Final illumination, no infill
@@ -134,18 +130,17 @@ while nSamples <= p.nTotalSamples
         nextGenes = nan(nNans,d.dof); % Create one 'blank' genome for each NAN
         
         % Identify (grab indx of NANs)
-        nanIndx = 1:p.nAdditionalSamples;
-        nanIndx = nanIndx(noValue);
+        nanIndx = 1:p.nAdditionalSamples;  nanIndx = nanIndx(noValue);
         
         % Replace with next in Sobol Sequence
         newSampleRange = sobPoint:(sobPoint+nNans-1);
-        mapLinIndx = sobol2indx(sobSet,newSampleRange,p);
-        [chosenI,chosenJ] = ind2sub(p.featureRes, mapLinIndx);
+        mapLinIndx = sobol2indx(sobSet,newSampleRange,d, acqMap.edges);
+        [chosenI,chosenJ] = ind2sub(d.featureRes, mapLinIndx);
         for iGenes=1:nNans % Pull out chosen genomes from map
             nextGenes(iGenes,:) = acqMap.genes(chosenI(iGenes),chosenJ(iGenes),:);
         end
         
-        % Reevaluate
+        % Evaluate
         measuredValue = feval(d.preciseEvaluate, nextGenes, d);
         
         % Assign found values

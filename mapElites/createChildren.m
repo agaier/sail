@@ -1,4 +1,4 @@
-function children = createChildren(map,p)
+function children = createChildren(map, p, d)
 %createChildren - produce new children through mutation of map elite
 %
 % Syntax:  children = createChildren(map,p)
@@ -42,7 +42,7 @@ function children = createChildren(map,p)
     
     % Choose parents and create mutation
     parents = parentPool(randi([1 nFilledCells], [p.nChildren 1]), :);
-    mutation = randn(p.nChildren,p.genomeLength) .* p.mutSigma;
+    mutation = randn(p.nChildren,d.dof) .* p.mutSigma;
     
     % Apply mutation
     children = parents + mutation;

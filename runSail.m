@@ -31,7 +31,7 @@ p = sail;
  p.nAdditionalSamples= 10;    
  p.nTotalSamples     = 100;    
  p.nChildren         = 50;    
- p.nGens             = 300;  
+ p.nGens             = 100;  
  %p.featureRes        = [10 10]; %[ Xup, Zup]
  p.varCoef           = 10;
  p.display.illu      = true;
@@ -43,5 +43,6 @@ p = sail;
  
 % % % % % % % % % % % % % % %
 tic;
-output = sail(p);
+d = af_DomainParameters;
+output = sail(d,p);
 disp(['Runtime: ' seconds2human(toc)]);

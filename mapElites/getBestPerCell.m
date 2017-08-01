@@ -1,4 +1,4 @@
-function [bestIndex, bestBin] = getBestPerCell(samples,fitness,p)
+function [bestIndex, bestBin] = getBestPerCell(samples,fitness,d, edges)
 %getBestPerCell - Returns index of best individual in each cell
 %
 % Syntax:  [bestIndex, bestBin] = getBestPerCell(samples,fitness,p)
@@ -26,8 +26,11 @@ function [bestIndex, bestBin] = getBestPerCell(samples,fitness,p)
 % Jun 2016; Last revision: 27-Jan-2016
 
 %------------- BEGIN CODE --------------
-for iDim = 1:p.nDims
-    bin(:,iDim) = discretize(samples(:,p.featureIndx(iDim)),p.edges{iDim});
+
+% Get Features of all samples
+feature = feval(d.categorize, samples, d);
+for iDim = 1:d.nDims
+    bin(:,iDim) = discretize(feature(:,iDim),edges{iDim});
 end
 [sortedByFeatureAndFitness, indxSortOne] = sortrows([bin fitness]);
 [~, indxSortTwo] = unique(sortedByFeatureAndFitness(:,[1 2]),'rows');

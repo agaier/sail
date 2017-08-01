@@ -26,7 +26,7 @@ function [map, h] = mapElites(fitnessFunction,map,p,d,varargin)
 h = [];
 if p.display.illu
     figure(2); clf;
-    [h(1), h(2)] = viewMap(map.fitness,p); title('Illumination Fitness')
+    [h(1), h(2)] = viewMap(map.fitness, d, map.edges); title('Illumination Fitness')
 end
 
 iGen = 0;
@@ -36,15 +36,15 @@ while (iGen < p.nGens)
     % constraints are created
     children = [];
     while size(children,1) < p.nChildren
-        newChildren = createChildren(map,p);
+        newChildren = createChildren(map, p, d);
         validInds = feval(d.validate,newChildren,d);
         children = [children ; newChildren(validInds,:)] ; %#ok<AGROW>
     end
     children = children(1:p.nChildren,:);
-    [fitness, values] = fitnessFunction(children);
+    [fitness, values] = fitnessFunction(children); %% TODO: Speed up with out anonymous functions? %%
 
     %% Add Children to Map   
-    [replaced, replacement] = nicheCompete(children,fitness,map,p);
+    [replaced, replacement] = nicheCompete(children,fitness,map,d);
     map = updateMap(replaced,replacement,map,fitness,children,...
                         values,d.extraMapValues);  
                        

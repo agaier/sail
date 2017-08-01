@@ -15,28 +15,27 @@ function p = defaultParamSet()
 
 %------------- BEGIN CODE --------------
 
-% Load Base Airfoil
-load('raeParsec.mat'); load('raeRange.mat');  
-p.base = loadBaseAirfoil(raeParsec, raeRange);
 
-% Set Expression Methods
-p.dof = 10;
-p.express = setExpression(p.base.parsec, p.base.range,p.dof);
+% load('raeParsec.mat'); load('raeRange.mat');  
+% p.base = loadBaseAirfoil(raeParsec, raeRange);
+% 
+% % Set Expression Methods
+% p.dof = 10;
 
 % Set Fitness Methods
-p.varCoef = 1;
-p.muCoef  = 1; % only used for experiments which only use variance
-p.acquisitionFunction = 'computeFitness';
-p.preciseEvalFunction = 'dragFit';
+%p.varCoef = 1;
+%p.muCoef  = 1; % only used for experiments which only use variance
+%p.acquisitionFunction = 'computeFitness';
+%p.preciseEvalFunction = 'dragFit';
 
 % MAP-Elites Parameters
-p.featureIndx       = [2 3]; 
-p.featureRes        = [25 25]; 
-p.nDims             = length(p.featureRes);
+%p.featureIndx       = [2 3]; 
+%p.featureRes        = [25 25]; 
+%p.nDims             = length(p.featureRes);
 p.nChildren         = 250; 
 p.mutSigma          = 0.1; 
 p.nGens             = 500;
-p.genomeLength      = p.dof;
+%p.genomeLength      = p.dof;
 
 % Model Parameters
 p.nInitialSamples   = 50;
