@@ -34,7 +34,6 @@ function d = af_DomainParameters
 %------------- BEGIN CODE --------------
 
 % Scripts
-d.initialize        = 'af_InitialSamples';
 d.preciseEvaluate   = 'af_PreciseEvaluate';
 d.categorize        = 'af_Categorize';
 d.createAcqFunction = 'af_CreateAcqFunc';
