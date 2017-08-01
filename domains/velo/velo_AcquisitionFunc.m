@@ -1,4 +1,4 @@
-function [fitness,predValues] = velo_AcquisitionFunc(drag,lift,foil,d)
+function [fitness,predValue] = velo_AcquisitionFunc(drag,d)
 %computeFitness - Computes fitness with penalties from drag, lift, area
 %
 % Syntax:  [fitness, drag, lift] = computeFitness(drag, lift, initialFoils)
@@ -30,15 +30,8 @@ function [fitness,predValues] = velo_AcquisitionFunc(drag,lift,foil,d)
 % Jun 2016; Last revision: 01-Aug-2017
 
 %------------- BEGIN CODE --------------
-fitDrag = (d.muCoef * drag(:,1)) - (d.varCoef * drag(:,2) );
 
-area = squeeze(polyarea(foil(1,:,:),foil(2,:,:)));
-areaPenalty = (1-(abs(area-d.base.area)./d.base.area)).^7;
-liftPenalty = (1- normcdf(d.base.lift, lift(:,1), lift(:,2))).^2;
-
-fitness = fitDrag .* liftPenalty .* areaPenalty;
-
-predValues{1} = drag;
-predValues{2} = lift;
+fitness = -(drag(:,1)*d.muCoef - drag(:,2)*d.varCoef); % better fitness is higher fitness  
+predValue = drag(:,1);
 
 %------------- END OF CODE --------------

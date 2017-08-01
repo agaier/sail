@@ -35,10 +35,10 @@ function d = velo_Domain
 
 % Scripts
 d.preciseEvaluate   = 'velo_PreciseEvaluate';
-d.categorize        = 'velo_Categorize';
-d.createAcqFunction = 'Velo_CreateAcqFunc';
-d.validate          = 'velo_ValidateChildren';
-d.saveData          = 'velo_RecordData';
+d.categorize        = 'velo_Categorize'; %
+d.createAcqFunction = 'velo_CreateAcqFunc'; %
+d.validate          = 'velo_ValidateChildren'; %
+d.saveData          = 'velo_RecordData'; %
 
 % Alternative initialization
 d.loadInitialSamples = true;
@@ -46,25 +46,24 @@ d.initialSampleSource= '#notallvelos.mat';
 
 % Genotype to Phenotype Expression
 d.dof = 16;
-d.express = @(x) expressVelo(x, 
+%d.express = @(genome, filename) expressVelo(x, 
 
 % Feature Space
-d.featureRes = [25 25];
+d.featureRes = [20 20];
 d.nDims      = length(d.featureRes);
-d.featureMin = [0 0];
-d.featureMax = [1 1];
-d.featureLabels = {'Z_{up}','X_{up}'}; % {X label, Y label}
+d.featureMin = [0.01 7];
+d.featureMax = [0.04 23];
+d.featureLabels = {'Curvature','Volume'}; % {X label, Y label}
 
 % GP Models
 d.gpParams(1)= paramsGP(d.dof); % Drag
-d.gpParams(2)= paramsGP(d.dof); % Lift
 
 % Acquisition function
-d.varCoef = 1; % variance weight
+d.varCoef = 1e2; % variance weight
 d.muCoef  = 1; % mean weight 
 
 % Domain Specific
-d.extraMapValues = {'cD','cL'};
+d.extraMapValues = {};
 
 
 

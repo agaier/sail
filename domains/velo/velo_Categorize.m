@@ -32,7 +32,8 @@ function [feature] = velo_Categorize(samples, d)
 %------------- BEGIN CODE --------------
 
 parfor i=1:size(samples,1)
-    [~, ~, feature(:,i)] = expressVelo(samples(i,:),'categoryOnly',true);
+    [~, ~, feature(i,:)] = expressVelo(samples(i,:),'categoryOnly',true);
 end
-
+feature = (feature-d.featureMin)./(d.featureMax-d.featureMin);
+feature(feature>1) = 1; feature(feature<0) = 0;
 %------------- END OF CODE --------------

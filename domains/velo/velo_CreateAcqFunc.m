@@ -33,10 +33,8 @@ function [acqFunction] = velo_CreateAcqFunc(gpModel, d)
 
 %------------- BEGIN CODE --------------
 
-acqFunction = @(x) af_AcquisitionFunc(...
-                        predictGP(gpModel{1},x),... % Drag
-                        predictGP(gpModel{2},x),... % Lift
-                        d.express(x),...            % Area
+acqFunction = @(x) velo_AcquisitionFunc(...
+                        predictGP(gpModel{1},x),... % Drag Force Model
                         d);                         % Hyperparams and base
 
 %------------- END OF CODE --------------

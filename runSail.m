@@ -27,9 +27,9 @@
 p = sail;
 
 % Adjust hyperparameters 
- p.nInitialSamples   = 20;   
- p.nAdditionalSamples= 10;    
- p.nTotalSamples     = 100;    
+ p.nInitialSamples   = 250;   
+ p.nAdditionalSamples= 4;    
+ p.nTotalSamples     = 254;    
  p.nChildren         = 50;    
  p.nGens             = 100;
  

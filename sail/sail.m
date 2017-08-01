@@ -50,6 +50,9 @@ if ~d.loadInitialSamples
     [observation, value] = initialSampling(d,p.nInitialSamples);
 else
     load(d.initialSampleSource);
+    randomPick = randperm(10000,p.nInitialSamples);
+    observation = observation(randomPick,:);
+    value = value(randomPick,:);
 end
 nSamples = size(observation,1);
 
