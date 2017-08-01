@@ -29,19 +29,13 @@ function children = createChildren(map, p, d)
 % email: adam.gaier@h-brs.de
 % Jun 2016; Last revision: 07-Jun-2016
 
-%------------- BEGIN CODE --------------
-    boolFilledCells = ~isnan(map.fitness(:));
-    indxFilledCells = find(boolFilledCells==1);
-    nFilledCells = length(indxFilledCells);
-    
-    [r,c] = size(map.fitness);
-    [filledI,filledJ] = ind2sub([r c], indxFilledCells);
-    for i=1:nFilledCells
-        parentPool(i,:) = map.genes(filledI(i),filledJ(i),:);
-    end
+%------------- BEGIN CODE --------------  
+    % Remove empty bins from parent pool
+    parentPool = reshape(map.genes,[numel(map.fitness), d.dof]);
+    parentPool(isnan(parentPool(:,1)),:) = []; 
     
     % Choose parents and create mutation
-    parents = parentPool(randi([1 nFilledCells], [p.nChildren 1]), :);
+    parents = parentPool(randi([1 size(parentPool,1)], [p.nChildren 1]), :);
     mutation = randn(p.nChildren,d.dof) .* p.mutSigma;
     
     % Apply mutation
