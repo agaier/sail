@@ -27,11 +27,12 @@ function [feature] = velo_Categorize(samples, d)
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Jun 2016; Last revision: 27-Jan-2017
+% Jun 2016; Last revision: 01-Aug-2017
 
 %------------- BEGIN CODE --------------
 
-feature = samples(:,[2 3]);
-feature = (feature-d.featureMin)./(d.featureMax-d.featureMin);
+parfor i=1:size(samples,1)
+    [~, ~, feature(:,i)] = expressVelo(samples(i,:),'categoryOnly',true);
+end
 
 %------------- END OF CODE --------------
