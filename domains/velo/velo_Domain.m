@@ -40,11 +40,13 @@ d.createAcqFunction = 'Velo_CreateAcqFunc';
 d.validate          = 'velo_ValidateChildren';
 d.saveData          = 'velo_RecordData';
 
+% Alternative initialization
+d.loadInitialSamples = true;
+d.initialSampleSource= '#notallvelos.mat';
+
 % Genotype to Phenotype Expression
-d.dof = 15;
-load('raeParsec_aft.mat'); load('raeRange_aft.mat');  
-d.base = loadBaseAirfoil(raeParsec, raeRange);
-d.express = setExpression(d.base.parsec, d.base.range, d.dof);
+d.dof = 16;
+d.express = @(x) expressVelo(x, 
 
 % Feature Space
 d.featureRes = [25 25];

@@ -44,7 +44,7 @@ p = sail;
  
 % % % % % % % % % % % % % % %
 tic;
-d = af_Domain;
+d = velo_Domain;
 output = sail(d,p);
 disp(['Runtime: ' seconds2human(toc)]);
 

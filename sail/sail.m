@@ -46,8 +46,13 @@ function [output] = sail(d,p)
 if nargin==0; output = defaultParamSet; return; end
 
 %% 0 - Produce Initial Samples
-[observation, value] = initialSampling(d,p.nInitialSamples);
+if ~d.loadInitialSamples
+    [observation, value] = initialSampling(d,p.nInitialSamples);
+else
+    load(d.initialSampleSource);
+end
 nSamples = size(observation,1);
+
 
 %% Acquisition Loop
 while nSamples <= p.nTotalSamples
