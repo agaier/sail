@@ -1,4 +1,4 @@
-function dragF = preciseEval(x, stlFileName,openFoamFolder)
+function dragF = velo_openFoamResult(x, stlFileName,openFoamFolder)
 dragF = nan;
 
 % Create STL
@@ -14,14 +14,14 @@ resultOutputFile = [openFoamFolder 'forces.dat'];
 tic;
 while ~exist([openFoamFolder 'mesh.timing'] ,'file')
     display(['Waiting for Meshing: ' seconds2human(toc)]);
-    pause(5);
+    pause(30);
 end
 display(['|----| Meshing done in ' seconds2human(toc)]);
 
 tic;
 while ~exist([openFoamFolder 'all.timing'] ,'file')
     display(['Waiting for CFD: ' seconds2human(toc)]);
-    pause(5);
+    pause(30);
 end
 display(['|----| CFD done in ' seconds2human(toc)]);
 

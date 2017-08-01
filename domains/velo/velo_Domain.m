@@ -46,7 +46,6 @@ d.initialSampleSource= '#notallvelos.mat';
 
 % Genotype to Phenotype Expression
 d.dof = 16;
-%d.express = @(genome, filename) expressVelo(x, 
 
 % Feature Space
 d.featureRes = [20 20];
@@ -64,6 +63,14 @@ d.muCoef  = 1; % mean weight
 
 % Domain Specific
 d.extraMapValues = {};
+
+% --- There should be a folder called 'case1, case2, ..., caseN in this
+% folder, where N is the number of new samples added every iteration.
+% --- Each folder has a shell script called 'caserunner.sh' which must be
+% run, this will cause an instance of openFoam to run whenever a signal is
+% given (to allow jobs to be run on nodes with minimal communication).
+% TODO: make script that creates folders and/runs caserunners
+d.openFoamFolder = '/home/adam/Code/sail/domains/velo/openFoam/';
 
 
 
