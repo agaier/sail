@@ -1,7 +1,5 @@
-function validity = af_ValidateChildren(children,d)    
+function validity = velo_ValidateChildren(children,d)    
 
-[~, ul, ll, parsecParams] = d.express(children);
-for i=1:size(children,1)
-    % TODO: Vectorize getValidity
-    validity(i) = getValidity(ul(:,:,i),ll(:,:,i),parsecParams(i,:)); %#ok<AGROW>
+parfor i=1:p.nChildren
+    validity(i) = expressVelo(children(i,:)','validateOnly',true);    
 end
