@@ -31,7 +31,7 @@ function [feature] = af_Categorize(samples, d)
 
 %------------- BEGIN CODE --------------
 
-feature = samples(:,d.featureIndx);
+feature = samples(:,[2 3]);
 feature = (feature-d.featureMin)./(d.featureMax-d.featureMin);
 
 %------------- END OF CODE --------------

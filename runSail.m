@@ -31,18 +31,40 @@ p = sail;
  p.nAdditionalSamples= 10;    
  p.nTotalSamples     = 100;    
  p.nChildren         = 50;    
- p.nGens             = 100;  
- %p.featureRes        = [10 10]; %[ Xup, Zup]
- p.varCoef           = 10;
- p.display.illu      = true;
+ p.nGens             = 100;
+ 
+ p.display.illu      = false;
  p.display.illuMod   = 100;
+ p.display.figs      = true;      
+ 
  p.data.outSave      = false;
  p.data.mapEval      = true;
  p.data.mapEvalMod   = 50;              
- p.display.figs      = true;      
+ 
  
 % % % % % % % % % % % % % % %
 tic;
-d = af_DomainParameters;
+d = af_Domain;
 output = sail(d,p);
 disp(['Runtime: ' seconds2human(toc)]);
+
+%% Create Prediction Map from produced surrogate
+predMap = createPredictionMap(output.model,p,d);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

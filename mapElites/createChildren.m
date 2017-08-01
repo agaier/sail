@@ -27,7 +27,7 @@ function children = createChildren(map, p, d)
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Jun 2016; Last revision: 07-Jun-2016
+% Jun 2016; Last revision: 01-Aug-2017
 
 %------------- BEGIN CODE --------------  
     % Remove empty bins from parent pool

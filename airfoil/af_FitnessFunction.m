@@ -1,5 +1,5 @@
 function [fitness, drag, lift, area] = ...
-    dragFit(x, expressMethod, baseArea, baseLift)
+    af_FitnessFunction(x, expressMethod, baseArea, baseLift)
 %dragFit - Returns drag reduction fitness: drag and constraint violation
 % Soft Constraints:
 %   a) Area approximately the same as base foil
@@ -37,6 +37,7 @@ function [fitness, drag, lift, area] = ...
 %------------- BEGIN CODE --------------
 if size(x,1) > size(x,2);x=x';end
 [shape,ul,ll,parsecParams] = expressMethod(x);
+
 if getValidity(ul,ll,parsecParams)
     [drag ,lift] = xfoilEvaluate(shape);
     

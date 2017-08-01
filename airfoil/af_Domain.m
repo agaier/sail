@@ -29,42 +29,45 @@ function d = af_DomainParameters
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (BRSU)
 % email: adam.gaier@h-brs.de
-% Jun 2017; Last revision: 30-Jul-2017
+% Jun 2017; Last revision: 01-Aug-2017
 
 %------------- BEGIN CODE --------------
 
-d.initialize = 'af_InitialSamples';
+% Scripts
+d.initialize        = 'af_InitialSamples';
+d.preciseEvaluate   = 'af_PreciseEvaluate';
+d.categorize        = 'af_Categorize';
+d.createAcqFunction = 'af_CreateAcqFunc';
+d.validate          = 'af_ValidateChildren';
+d.saveData          = 'af_RecordData';
 
-% Load Base Airfoil
-load('raeParsec.mat'); load('raeRange.mat');  
-d.base = loadBaseAirfoil(raeParsec, raeRange);
-
-% Set Expression Methods
+% Genotype to Phenotype Expression
 d.dof = 10;
+load('raeParsec_aft.mat'); load('raeRange_aft.mat');  
+d.base = loadBaseAirfoil(raeParsec, raeRange);
 d.express = setExpression(d.base.parsec, d.base.range, d.dof);
 
+% Feature Space
+d.featureRes = [25 25];
+d.nDims      = length(d.featureRes);
+d.featureMin = [0 0];
+d.featureMax = [1 1];
+d.featureLabels = {'Z_{up}','X_{up}'}; % {X label, Y label}
 
-d.preciseEvalFunction = 'dragFit';
-d.preciseEvaluate = 'af_PreciseEvaluate';
-
+% GP Models
 d.gpParams(1)= paramsGP(d.dof); % Drag
 d.gpParams(2)= paramsGP(d.dof); % Lift
-d.createAcqFunction= 'af_CreateAcqFunc';
+
+% Acquisition function
 d.varCoef = 1; % variance weight
 d.muCoef  = 1; % mean weight 
 
-d.categorize = 'af_Categorize';
-d.featureIndx       = [2 3]; 
-d.featureRes = [25 25];
-d.nDims             = length(d.featureRes);
-d.featureMin = 0;
-d.featureMax = 1;
-
+% Domain Specific
 d.extraMapValues = {'cD','cL'};
 
-d.validate = 'af_ValidateChildren';
 
-d.saveData = 'af_RecordData';
+
+
 
 
 %------------- END OF CODE --------------

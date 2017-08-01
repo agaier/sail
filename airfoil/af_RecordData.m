@@ -1,3 +1,5 @@
+%% af_Record data: do any data gathering here
+
 %% TODO: Convert this to function and reformat for generalized SAIL
 
 if (nSamples == p.nTotalSamples)  ...                   % @End

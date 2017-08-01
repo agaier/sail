@@ -34,8 +34,8 @@ end
 
 imgHandle = imagesc(flip(mapMatrix)); fitPlot = gca;
 set(imgHandle,'AlphaData',~isnan(imgHandle.CData)*1)
-xlab = xlabel(strcat(num2Parsec(d.featureIndx(2)),'\rightarrow'));
-ylab = ylabel(['\uparrow' num2Parsec(d.featureIndx(1)) ]);
+xlab = xlabel([d.featureLabels{1} '\rightarrow']);
+ylab = ylabel(['\uparrow' d.featureLabels{2} ]);
 set(ylab,'Rotation',0,'Position',get(ylab,'Position')-yOffset)
 
 

@@ -1,5 +1,5 @@
-function [nextObservation, newValue] = af_InitialSamples(d,nInitialSamples)
-%af_InitialSamples - Produces initial airfoil samples
+function [nextObservation, newValue] = initialSampling(d,nInitialSamples)
+%af_InitialSamples - Produces initial samples
 % Initial samples are produced using a Sobol sequence to evenly sample the
 % parameter space. If initial samples are invalid (invalid geometry, or did
 % not converge in simulator), the next sample in the Sobol sequence is

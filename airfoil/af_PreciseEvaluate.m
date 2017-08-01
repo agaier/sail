@@ -35,11 +35,31 @@ function [value] = af_PreciseEvaluate(nextObservations, d)
 
 % Evaluate initially chosen solutions
 parfor iFoil = 1:size(nextObservations,1)
-    [~,newcD(iFoil,1), newcL(iFoil,1),~] = dragFit(...
-        nextObservations(iFoil,:), d.express,d.base.area,d.base.lift); %#ok<PFBNS>
+    [shape,ul,ll,parsecParams] = d.express(nextObservations(iFoil,:));
+    
+    if getValidity(ul,ll,parsecParams)
+        [drag ,lift] = xfoilEvaluate(shape);
+       
+        drag = log(drag);
+        
+        area = polyarea(shape(1,:), shape(2,:));
+        areaPenalty = (1-(abs(area-d.base.area)./d.base.area)).^7;
+        liftPenalty = (1-(abs(lift-d.base.lift)./d.base.lift)).^2;
+        liftPenalty = max([liftPenalty (lift > d.base.lift)]); %only penalty
+        
+        fitness(iFoil) = drag.*areaPenalty.*liftPenalty;
+    else
+        disp('invalid geometry');
+        drag    = nan;
+        lift    = nan;
+        fitness = nan;
+    end
+    
+    cD(iFoil) = drag;
+    cL(iFoil) = lift;
 end
 
-value(:,1) = newcD;
-value(:,2) = newcL;
+value(:,1) = cD;
+value(:,2) = cL;
 
 %------------- END OF CODE --------------
