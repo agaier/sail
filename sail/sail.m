@@ -108,7 +108,7 @@ while nSamples <= p.nTotalSamples
     % On Final illumination, no infill
     if nSamples == p.nTotalSamples; break; else
         
-        newValue = nan(p.nAdditionalSamples, length(d.featureRes)); % new values will be stored here
+        newValue = nan(p.nAdditionalSamples, size(value,2)); % new values will be stored here
         noValue = any(isnan(newValue),2);
         
         while any(any(noValue))
