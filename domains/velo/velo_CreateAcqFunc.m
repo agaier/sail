@@ -1,30 +1,16 @@
 function [acqFunction] = velo_CreateAcqFunc(gpModel, d)
-%FUNCTION_NAME - One line description of what the function or script performs (H1 line)
-%Optional file header info (to give more details about the function than in the H1 line)
-%Optional file header info (to give more details about the function than in the H1 line)
-%Optional file header info (to give more details about the function than in the H1 line)
+%velo_CreateAcqFunc - Packages GP models into easily used acquisition function
 %
-% Syntax:  [output1,output2] = function_name(input1,input2,input3)
+% Syntax:  acqFunction = velo_CreateAcqFunction, gpModel, d);
 %
 % Inputs:
-%    input1 - Description
-%    input2 - Description
-%    input3 - Description
+%    gpModel - cell - one or more gaussian process models
+%    d              - Domain description struct
+%    .express       - genotype->phenotype conversion function
 %
 % Outputs:
-%    output1 - Description
-%    output2 - Description
+%    acqFunction - anonymous function that takes genome as input and
 %
-% Example: 
-%    Line 1 of example
-%    Line 2 of example
-%    Line 3 of example
-%
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also: OTHER_FUNCTION_NAME1,  OTHER_FUNCTION_NAME2
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (BRSU)

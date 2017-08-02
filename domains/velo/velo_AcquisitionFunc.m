@@ -1,28 +1,17 @@
 function [fitness,predValue] = velo_AcquisitionFunc(drag,d)
-%computeFitness - Computes fitness with penalties from drag, lift, area
+%velo_AcquisitionFunc - Infill criteria based on uncertainty and fitness
 %
-% Syntax:  [fitness, drag, lift] = computeFitness(drag, lift, initialFoils)
+% Syntax:  [fitness, dragForce] = velo_AcquisitionFunc(drag,d)
 %
 % Inputs:
-%   drag -    [2XN]    - drag mean and variance (log space)
-%   lift -    [2XN]    - lift mean and variance
-%   foil -    [2XMXN]  - [X,Y] defined over M points, of N individuals
+%   drag -    [2XN]    - dragForce mean and variance
 %   d    -             - domain struct 
 %   .varCoef  [1X1]    - uncertainty weighting for UCB
-%   .baseLift [1X1]    - lift of base foil
-%   .baseArea [1X1]    - area of base foil
 %
 % Outputs:
-%    fitness - [1XN] - Fitness value (lower is better)
+%    fitness   - [1XN] - Fitness value (lower is better)
+%    predValue - [1XN] - Predicted drag force (mean)
 %
-%
-% Example: 
-%
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also: OTHER_FUNCTION_NAME1,  OTHER_FUNCTION_NAME2
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)

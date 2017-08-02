@@ -1,33 +1,22 @@
 function [feature] = velo_Categorize(samples, d)
-%af_Categorize - Returns feature values between 0 and 1 for each dimension
+%velo_Categorize - Returns feature values between 0 and 1 for each dimension
 %
-% Syntax:  [fitness, drag, lift] = computeFitness(drag, lift, initialFoils)
+% Syntax:  [feature] = velo_Categorize(samples, d)
 %
 % Inputs:
-%   drag -    [2XN]    - drag mean and variance (log space)
-%   lift -    [2XN]    - lift mean and variance
-%   foil -    [2XMXN]  - [X,Y] defined over M points, of N individuals
-%   p    -             - parameter struct 
-%   .varCoef  [1X1]    - uncertainty weighting for UCB
-%   .baseLift [1X1]    - lift of base foil
-%   .baseArea [1X1]    - area of base foil
+%   samples  - [N X genomeLength] - uncategorized solutions
+%   d        -  Domain description struct
+%   .featureMin [1X1]   - minimum feature value
+%   .featureMax [1X1]   - maximum feature value
 %
 % Outputs:
-%    fitness - [1XN] - Fitness value (lower is better)
+%    feature - [MXN] - Feature values for each individual
 %
-%
-% Example: 
-%
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also: OTHER_FUNCTION_NAME1,  OTHER_FUNCTION_NAME2
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Jun 2016; Last revision: 01-Aug-2017
+% Jun 2016; Last revision: 02-Aug-2017
 
 %------------- BEGIN CODE --------------
 
