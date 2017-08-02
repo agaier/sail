@@ -22,11 +22,8 @@ https://hal.inria.fr/hal-01518786/file/aiaa_sail.pdf
 Produced using
     Matlab Version: 9.1.0.441655 (R2016b)
 
-Required Toolboxes:
-
-Parallel Computing (for precise evaluation speed up)
-
-Statistics and Machine Learning (for Sobol sequence)
+Required MATLAB Toolboxes:
+Parallel Computing (for precise evaluation speed up) and Statistics and Machine Learning (for Sobol sequence)
 
 
 Includes:
