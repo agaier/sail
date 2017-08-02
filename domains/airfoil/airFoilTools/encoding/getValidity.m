@@ -1,4 +1,7 @@
 function [valid, validTop, validBot] = getValidity(ul,ll, p)
+% getValidity - Validates airfoil
+% Returns true if no airfoil lines cross and highest top and bottom points
+% are in the correct positions.
     valid = true(1,3);
     
     % Lines intersect?

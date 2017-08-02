@@ -1,30 +1,21 @@
-function [value] = af_PreciseEvaluate(nextObservations, d)
-%af_InitialSamples - Produces initial airfoil samples
-% Initial samples are produced using a Sobol sequence to evenly sample the
-% parameter space. If initial samples are invalid (invalid geometry, or did
-% not converge in simulator), the next sample in the Sobol sequence is
-% chosen. Lather, rinse, repeat until all initial samples are clean.
+function [value, fitness] = af_PreciseEvaluate(observations, d)
+%af_PreciseEvaluate - Evaluates airfoils in XFoil
 %
 % Syntax:  [observation, value] = af_InitialSamples(p)
 %
 % Inputs:
-%    d - domain description struct
-%       .preciseEvalFunction
-%       .express
-%       .base.area
-%       .base.lift
-%    nInitialSamples - initial samples to produce
+%    observations - Samples to evaluate
+%    d            - domain description struct
+%                   .express
+%                   .base.area
+%                   .base.lift    
 %
 % Outputs:
-%    observation - [nInitialSamples X nParameters]
-%    value(:,1)  - [nInitialSamples X 1] cD (coefficient of drag)
-%    value(:,2)  - [nInitialSamples X 1] cL (coefficient of lift)
+%    value(:,1)  - [nObservations X 1] cD (coefficient of drag)
+%    value(:,2)  - [nObservations X 1] cL (coefficient of lift)
+%    fitness     - [nObservations X 1] calculated performance
 %
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also: OTHER_FUNCTION_NAME1,  OTHER_FUNCTION_NAME2
+% Other m-files required: xFoilEvaluate
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (BRSU)
@@ -34,8 +25,8 @@ function [value] = af_PreciseEvaluate(nextObservations, d)
 %------------- BEGIN CODE --------------
 
 % Evaluate initially chosen solutions
-parfor iFoil = 1:size(nextObservations,1)
-    [shape,ul,ll,parsecParams] = d.express(nextObservations(iFoil,:));
+parfor iFoil = 1:size(observations,1)
+    [shape,ul,ll,parsecParams] = d.express(observations(iFoil,:));
     
     if getValidity(ul,ll,parsecParams)
         [drag ,lift] = xfoilEvaluate(shape);

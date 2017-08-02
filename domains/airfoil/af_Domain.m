@@ -1,30 +1,21 @@
 function d = af_Domain
-%af_DomainParameters - Airfoil Domain Parameters
+%af_Domain - Airfoil Domain Parameters
 %Returns struct with default for all settings of airfoil domain including
 %hyperparameters, and strings indicating functions for representation and 
 %evaluation.
 %
-% Syntax:  [output1,output2] = function_name(input1,input2,input3)
-%
-% Inputs:
-%    input1 - Description
-%    input2 - Description
-%    input3 - Description
-%
-% Outputs:
-%    output1 - Description
-%    output2 - Description
+% Syntax:  d = af_Domain;
 %
 % Example: 
-%    Line 1 of example
-%    Line 2 of example
-%    Line 3 of example
+%    output = sail(sail,af_Domain);
 %
 % Other m-files required: none
 % Subfunctions: none
-% MAT-files required: none
+% MAT-files required:
+%   /domains/airfoil/airfoilTools/demo/raeParsec_aft.mat
+%   /domains/airfoil/airfoilTools/demo/raeRange_aft.mat
 %
-% See also: OTHER_FUNCTION_NAME1,  OTHER_FUNCTION_NAME2
+% See also: sail, runSail
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (BRSU)

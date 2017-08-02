@@ -1,7 +1,7 @@
 function [fitness,predValues] = af_AcquisitionFunc(drag,lift,foil,d)
-%computeFitness - Computes fitness with penalties from drag, lift, area
+%af_AcquisitionFunc - Infill criteria based on uncertainty and fitness
 %
-% Syntax:  [fitness, drag, lift] = computeFitness(drag, lift, initialFoils)
+% Syntax:  [fitness, predValues] = af_AcquisitionFunc(drag, lift, initialFoils, d)
 %
 % Inputs:
 %   drag -    [2XN]    - drag mean and variance (log space)
@@ -13,16 +13,9 @@ function [fitness,predValues] = af_AcquisitionFunc(drag,lift,foil,d)
 %   .baseArea [1X1]    - area of base foil
 %
 % Outputs:
-%    fitness - [1XN] - Fitness value (lower is better)
+%    fitness    - [1XN] - Fitness value (lower is better)
+%    predValues - {1,2}]- Drag, Lift 
 %
-%
-% Example: 
-%
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also: OTHER_FUNCTION_NAME1,  OTHER_FUNCTION_NAME2
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
