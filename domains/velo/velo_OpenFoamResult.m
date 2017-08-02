@@ -1,4 +1,23 @@
 function dragF = velo_openFoamResult(x, stlFileName,openFoamFolder)
+%velo_openFoamResult - Evaluates a single shape in OpenFOAM
+%
+% Syntax:  [observation, value] = af_InitialSamples(p)
+%
+% Inputs:
+%    x              - Sample genome to evaluate
+%    stlFileName    - Target to place expressed genome
+%    openFoamFolder - OpenFOAM case folder
+%
+% Outputs:
+%    dragF  - [1X1] drag force result
+%
+
+% Author: Adam Gaier
+% Bonn-Rhein-Sieg University of Applied Sciences (BRSU)
+% email: adam.gaier@h-brs.de
+% Jun 2017; Last revision: 02-Aug-2017
+
+%------------- BEGIN CODE --------------
 dragF = nan;
 
 % Create STL
