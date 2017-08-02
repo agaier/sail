@@ -1,49 +1,40 @@
 function predMap = createPredictionMap(gpModels,p,d)
-%createPredictionMap - Produced prediction map from surrogate model
-%Optional file header info (to give more details about the function than in the H1 line)
-%Optional file header info (to give more details about the function than in the H1 line)
-%Optional file header info (to give more details about the function than in the H1 line)
+%createPredictionMap - Produce prediction map from surrogate model
 %
-% Syntax:  [output1,output2] = function_name(input1,input2,input3)
+% Syntax:  predictionMap = createPredictionMap(gpModels,p,d)
 %
 % Inputs:
-%    input1 - Description
-%    input2 - Description
-%    input3 - Description
+%    gpModels   - GP model produced by SAIL
+%    p          - SAIL hyperparameter struct
+%    d          - Domain definition struct
 %
 % Outputs:
-%    output1 - Description
-%    output2 - Description
+%    predMap - prediction map
+%    .fitness     [Rows X Columns]
+%    .genes       [Rows X Columns X GenomeLength]
+%    .'otherVals' [Rows X Columns]
 %
 % Example: 
-%    Line 1 of example
-%    Line 2 of example
-%    Line 3 of example
+%    p = sail;
+%    d = af_Domain;
+%    output = sail(d,p);
+%    d.featureRes = [50 50];
+%    predMap = createPredictionMap(output.model,p,d);
+%    viewMap(predMap.fitness,d, predMap.edges)
 %
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
+% Other m-files required: mapElites  nicheCompete updateMap d.createAcqFunction
 %
-% See also: OTHER_FUNCTION_NAME1,  OTHER_FUNCTION_NAME2
+% See also: sail, mapElites, runSail
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (BRSU)
 % email: adam.gaier@h-brs.de
-% Jun 2017; Last revision: 1-Aug-2017
+% Jun 2017; Last revision: 01-Aug-2017
 
 % TODO: 'varargin' arguments to change hyperparameters below
 
 %------------- BEGIN CODE --------------
-
-% Adjust hyperparameters
-p.nChildren = 250;
-p.nGens = 500;
-
-p.display.illu = true;
-p.display.illuMod = 100;
-
 d.varCoef = 0; %no award for uncertainty
-d.featureRes = [50 50];
 
 % Construct functions
 acqFunction = feval(d.createAcqFunction,gpModels,d);

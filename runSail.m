@@ -1,26 +1,21 @@
-%RunSail -- Example usage script of sail function
+%runSail - Example usage script of sail function
 % Running sail without arguments will return a hyperparameter struct of
 % default values. These defaults can be changed in
-% /src/config/defaultParamSet.m
+% /sail/defaultParamSet.m
 % 
 % Running sail with a parameter struct as input will run the algorithm
 %
-% Example: 
-%    p = sail;                                  % Load default parameters
-%    p.nTotalSamples = 60;                      % Edit default parameters
-%    output = sail(p);                          % Run SAIL algorithm
-%    viewMap(output.predMap.fitness, output.p)  % View results    
 %
-% Other m-files required: defaultParamSet, sail
-% Other submodules required: map-elites, gpml-wrapper airFoilTools
-% MAT-files required: src/data/airfoil/raeParsec.mat, /raeParsec.mat
+% Other m-files required: defaultParamSet, sail, mapElites
+% Other submodules required: gpml-wrapper
+% 
 %
 % See also: mapElites, sail
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Nov 2016; Last revision: 27-Jan-2017
+% Nov 2016; Last revision: 01-Aag-2017
 
 %------------- BEGIN CODE --------------
 
@@ -46,13 +41,20 @@ p = sail;
 tic;
 %d = velo_Domain;
 d = af_Domain;
-profile on;
-output = sail(d,p);
-profile viewer;
+output = sail(p,af_Domain);
 disp(['Runtime: ' seconds2human(toc)]);
 
 %% Create Prediction Map from produced surrogate
+% Adjust hyperparameters
+p.nChildren = 250;
+p.nGens = 500;
+
+p.display.illu = true;
+p.display.illuMod = 100;
+d.featureRes = [50 50];
+
 predMap = createPredictionMap(output.model,p,d);
+viewMap(predMap.fitness, p, d) % View Prediction Map
 
 
 

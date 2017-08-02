@@ -1,38 +1,38 @@
-function [output] = sail(d,p)
+function [output] = sail(p,d)
 %SAIL - Surrogate Assisted Illumination Algorithm
 % Main run script of SAIL algorithm
 %
 % Syntax:  [output] = sail(p)   
 %
 % Inputs:
-%    p - struct for hyperparameters, visualization, and data gathering
+%   p  - struct - Hyperparameters for algorithm, visualization, and data gathering
+%   d  - struct - Domain definition
 %    * - sail with no arguments to return default parameter struct
 %
 % Outputs:
 %    output - output struct with fields:
-%               cD: true cD values of all tested samples [Nx1 double]
-%               cL: true cL values of all tested samples [Nx1 double]
-%          fitness: true fitness values of all tested samples [Nx1 double]
-%     inputSamples: genomes of all tested samples [NxM double]
-%           gpDrag: GP cD predictor function 
-%           gpLift: GP cL predictor function
-%              map: MAP of precisely evaluated solutions
-%           acqMap: MAP of optimal solutions for sampling
-%          predMap: MAP of best predicted solutions
-%          mapTrue: true values of predMap
-%                p: parameter struct
-%       
+%               .output.model{1}             - gpModels produced by SAIL
+%               .output.model{1}.trainInput  - input samples
+%               .output.model{1}.trainOutput - sample results
+%               .p - parameter struct (for data keeping)
+%               .* - other parameters recorded throughout run
 %
 % Example: 
 %    p = sail;                                  % Load default parameters
-%    p.nTotalSamples = 60;                      % Edit default parameters
-%    output = sail(p);                          % Run SAIL algorithm
-%    viewMap(output.predMap.fitness, output.p)  % View results    
+%    p.nTotalSamples = 80;                      % Edit default parameters
+%    d = af_Domain;                             % Load domain parameters
+%    output = sail(d,p);                        % Run SAIL algorithm
+%    predMap = createPredictionMap(output.model,p,d);
+%    viewMap(predMap.fitness, p, d)             % View Prediction Map   
 %
-% Other m-files required: defaultParamSet, initialSampling, trainGP,
-% createMap, nicheCompete, updateMap, mapElites, sobolset
+%
+% Other m-files required: 
+%   defaultParamSet, initialSampling, trainGP,
+%   createMap, nicheCompete, updateMap, mapElites, sobolset
+%
 % Other submodules required: map-elites, gpml-wrapper
-% MAT-files required: none
+%
+% MAT-files required: if loading initial samples "d.initialSampleSource"
 %
 % See also: runSail, createPredictionMap, mapElites
 
@@ -145,8 +145,7 @@ end % end acquisition loop
 
 output.p = p;
 output.model = gpModel;
-end %%end function
-
+end
 
 
 

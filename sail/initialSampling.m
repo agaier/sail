@@ -16,14 +16,15 @@ function [nextObservation, newValue] = initialSampling(d,nInitialSamples)
 %
 % Outputs:
 %    observation - [nInitialSamples X nParameters]
-%    value(:,1)  - [nInitialSamples X 1] cD (coefficient of drag)
-%    value(:,2)  - [nInitialSamples X 1] cL (coefficient of lift)
+%    value(:,N)  - values returned from precise evaluation, e.g.:
+%       value(:,1)  - [nInitialSamples X 1] cD (coefficient of drag)
+%       value(:,2)  - [nInitialSamples X 1] cL (coefficient of lift)
 %
-% Other m-files required: none
+% Other m-files required: sobolset (target of d.preciseEvaluate)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also: af_PreciseEvaluate
+% See also: sail
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (BRSU)
