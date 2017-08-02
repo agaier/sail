@@ -1,5 +1,5 @@
 function map = updateMap(replaced,replacement,map,...
-                            fitness,genes,values,extraMapValues)
+                            fitness,genes,values,extraMapValues) %#ok<INUSL>
 %updateMap - Replaces all values in a set of map cells
 %
 % Syntax:  map = updateMap(replaced,replacement,map,fitness,drag,lift,children)
@@ -9,25 +9,19 @@ function map = updateMap(replaced,replacement,map,...
 %   replacement - [1XM]  - linear index of children values to place in map
 %   map         - struct - population archive
 %   fitness     - [1XN]  - Child fitness
-%   drag        - [2XN]  - Child drag mean/variance
-%   lift        - [2XN]  - Child lift mean/variance
-%   children    - [NXD]  - Child genomes
+%   genes       - [NXD]  - Child genomes
+%   values      - [1XN]  - extra values of interest, e.g. 'cD'
 %
 % Outputs:
 %   map         - struct - population archive
 %
-% Example: 
-%
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
 %
 % See also: createMap, nicheCompete
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Jun 2016; Last revision: 07-Jun-2016
+% Jun 2016; Last revision: 02-Aug-2017
 
 %------------- BEGIN CODE --------------
 
@@ -48,6 +42,5 @@ if ~isempty(extraMapValues)
         eval(['map.' extraMapValues{iValues} '(replaced) = values{' int2str(iValues) '}(replacement);']);
     end
 end
-
 
 %------------- END OF CODE --------------

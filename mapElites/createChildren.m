@@ -4,25 +4,20 @@ function children = createChildren(map, p, d)
 % Syntax:  children = createChildren(map,p)
 %
 % Inputs:
-%   map     -             - population struct
+%   map - Population struct
 %    .fitness
 %    .genes
 %    .<additional info> (e.g., drag, lift, etc)
-%   p       -             - parameter struct
-%    .nChildren
-%    .mutSigma
+%   p   - SAIL hyperparameter struct
+%    .nChildren - number of children created
+%    .mutSigma  - sigma of gaussian mutation applied to children
+%   d   - Domain description struct
+%    .dof       - Degrees of freedom (genome length)
 %
 % Outputs:
-%   bestIndex - [1XN] - index of best individuals per cell
+%   children - [nChildren X genomeLength] - new solutions
 %
 %
-% Example:
-%
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also:
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)

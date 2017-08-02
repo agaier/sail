@@ -1,24 +1,25 @@
-function [map, h] = mapElites(fitnessFunction,map,p,d,varargin)
+function [map, h] = mapElites(fitnessFunction,map,p,d)
 %mapElites - Multi-dimensional Archive of Phenotypic Elites algorithm
 %
-% Syntax:  map = mapElites(fitnessFunction, map, p);
+% Syntax:  map = mapElites(fitnessFunction, map, p, d);
 %
 % Inputs:
-%   fitnessFunction - function - returns fitness of vector of individuals
-%   map             - function - initial solutions in F-dimensional map
-%   p               - struct   - parameter struct
+%   fitnessFunction - funct  - returns fitness of vector of individuals
+%   map             - struct - initial solutions in F-dimensional map
+%   p               - struct - Hyperparameters for algorithm, visualization, and data gathering
+%   d               - struct - Domain definition
 %
 % Outputs:
 %   map    - struct - population archive
 %   h      - [1X2]  - axes handle, data handle
 %
 %
-% See also: createChildren, computeFitness, getBestPerCell, updateMap
+% See also: createChildren, getBestPerCell, updateMap
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Jun 2016; Last revision: 27-Jan-2017
+% Jun 2016; Last revision: 02-Aug-2017
 
 %------------- BEGIN CODE --------------
 
@@ -41,8 +42,8 @@ while (iGen < p.nGens)
         children = [children ; newChildren(validInds,:)] ; %#ok<AGROW>
     end
     children = children(1:p.nChildren,:);
-    [fitness, values] = fitnessFunction(children); %% TODO: Speed up with out anonymous functions? %%
-
+    [fitness, values] = fitnessFunction(children); %% TODO: Speed up without anonymous functions
+    
     %% Add Children to Map   
     [replaced, replacement] = nicheCompete(children,fitness,map,d);
     map = updateMap(replaced,replacement,map,fitness,children,...

@@ -4,9 +4,11 @@ function [bestIndex, bestBin] = getBestPerCell(samples,fitness,d, edges)
 % Syntax:  [bestIndex, bestBin] = getBestPerCell(samples,fitness,p)
 %
 % Inputs:
-%   samples - [NXM]    - sample genome
-%   fitness - [NX1]    - fitness values
-%   p       -             - parameter struct
+%   samples - [NXM] - sample genome
+%   fitness - [NX1] - fitness values
+%   d       - Domain definition struct
+%   edges   - {[1 X FeatureRes(1)+1], [1 X FeatureRes(2)+1]}
+%           - bin edges of feature space
 %
 % Outputs:
 %   bestIndex - [1XN] - index of best individuals per cell
@@ -14,11 +16,9 @@ function [bestIndex, bestBin] = getBestPerCell(samples,fitness,d, edges)
 %
 % Example:
 %
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
+% Other m-files required: d.categorize
 %
-% See also: computeFitness,  createMap
+% See also: createMap
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)

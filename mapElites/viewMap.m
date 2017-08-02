@@ -1,29 +1,37 @@
 function [figHandle, imageHandle] = viewMap(mapMatrix, d, edges, varargin)
 %computeFitness - Computes fitness with penalties from drag, lift, area
 %
-% Syntax:  fitness = computeFitness(drag, lift, initialFoils)
+% Syntax:  viewMap(predMap.fitness, d, predMap.edges)
 %
 % Inputs:
-%   samples - [NXM]    - sample genome
-%   fitness - [NX1]    - fitness values
-%   p       -             - parameter struct
+%   mapMatrix   - [RXC]  - scalar value in each bin (e.g. fitness)
+%   d           - struct - Domain definition
+%   edges       - {[1 X FeatureRes(1)+1], [1 X FeatureRes(2)+1]}
+%               - bin edges of feature space
 %
 % Outputs:
-%   bestIndex - [1XN] - index of best individuals per cell
+%   figHandle   - handle of resulting figure
+%   imageHandle - handle of resulting map image
 %
 %
 % Example:
+%    p = sail;
+%    d = af_Domain;
+%    output = sail(d,p);
+%    d.featureRes = [50 50];
+%    predMap = createPredictionMap(output.model,p,d);
+%    viewMap(predMap.fitness,d, predMap.edges)
 %
 % Other m-files required: none
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also: computeFitness,  createMap
+% See also: createMap, updateMap, createPredictionMap
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Jun 2016; Last revision: 07-Jun-2016
+% Jun 2016; Last revision: 02-Aug-2017
 
 %------------- BEGIN CODE --------------
 
