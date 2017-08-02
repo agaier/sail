@@ -23,8 +23,11 @@ Produced using
     Matlab Version: 9.1.0.441655 (R2016b)
 
 Required Toolboxes:
-    Parallel Computing (for precise evaluation speed up)
-    Statistics and Machine Learning (for Sobol sequence)
+
+Parallel Computing (for precise evaluation speed up)
+
+Statistics and Machine Learning (for Sobol sequence)
+
 
 Includes:
     GMPL  Version 3.6, Rasmussen & Nickisch (help gpml)
