@@ -32,9 +32,16 @@ Includes:
 
 
 Required Software:
+
     Airfoil domain:
-        XFOIL low Rn airfoil design and analysis code 
+
+         XFOIL low Rn airfoil design and analysis code 
+        
         (raphael.mit.edu/xfoil/)
+        
+        
     Velo domain:
+        
         OpenFOAM computation fluid dynamics simulator (version 2.4.0)
+        
         (https://openfoam.org/download/2-4-0-ubuntu/)
