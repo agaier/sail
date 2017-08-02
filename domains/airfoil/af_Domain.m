@@ -1,4 +1,4 @@
-function d = af_DomainParameters
+function d = af_Domain
 %af_DomainParameters - Airfoil Domain Parameters
 %Returns struct with default for all settings of airfoil domain including
 %hyperparameters, and strings indicating functions for representation and 
@@ -39,6 +39,10 @@ d.categorize        = 'af_Categorize';
 d.createAcqFunction = 'af_CreateAcqFunc';
 d.validate          = 'af_ValidateChildren';
 d.saveData          = 'af_RecordData';
+
+% Alternative initialization
+d.loadInitialSamples = false;
+d.initialSampleSource= '';
 
 % Genotype to Phenotype Expression
 d.dof = 10;

@@ -27,11 +27,11 @@
 p = sail;
 
 % Adjust hyperparameters 
- p.nInitialSamples   = 250;   
- p.nAdditionalSamples= 2;    
- p.nTotalSamples     = 254;    
- p.nChildren         = 50;    
- p.nGens             = 100;
+ p.nInitialSamples   = 50;   
+ p.nAdditionalSamples= 10;    
+ p.nTotalSamples     = 150;    
+ p.nChildren         = 100;    
+ p.nGens             = 500;
  
  p.display.illu      = false;
  p.display.illuMod   = 100;
@@ -44,8 +44,11 @@ p = sail;
  
 % % % % % % % % % % % % % % %
 tic;
-d = velo_Domain;
+%d = velo_Domain;
+d = af_Domain;
+profile on;
 output = sail(d,p);
+profile viewer;
 disp(['Runtime: ' seconds2human(toc)]);
 
 %% Create Prediction Map from produced surrogate
