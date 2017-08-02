@@ -12,13 +12,12 @@ and
 presented at AIAA Aviation and Aeronautics Forum 2017.
 https://hal.inria.fr/hal-01518786/file/aiaa_sail.pdf
 
-'help sail' for contents of source code and main algorithm syntax
 
-Two domains are provided: 2D airfoils (help airfoil) and 3D velomobile 
-shells (help velo). To apply SAIL to a new domain only new representation 
-and evaluation functions must be created. More sample domains will be made
-public as their are published. If you are interested in creating a new
-domain and having trouble, don't hesistate to ask!
+     Two domains are provided: 2D airfoils (help airfoil) and 3D velomobile 
+     shells (help velo). To apply SAIL to a new domain only new representation 
+     and evaluation functions must be created. More sample domains will be made
+     public as their are published. If you are interested in creating a new
+     domain and having trouble, don't hesistate to ask!
 
 Produced using
     Matlab Version: 9.1.0.441655 (R2016b)
