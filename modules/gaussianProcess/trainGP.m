@@ -15,7 +15,7 @@ function [GP_model] = trainGP(input,output,d, varargin)
 % email: adam.gaier@h-brs.de
 % May 2016; Last revision: 02-Aug-2016
 
-%------------- BEGIN INPUT PARSING --------------
+%------------- INPUT PARSING -----------
 parse = inputParser;
 parse.addRequired('input');
 parse.addRequired('output');

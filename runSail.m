@@ -49,12 +49,10 @@ disp(['Runtime: ' seconds2human(toc)]);
 p.nChildren = 250;
 p.nGens = 500;
 
-p.display.illu = true;
-p.display.illuMod = 100;
-d.featureRes = [50 50];
+p.display.illu = true; p.display.illuMod = 100;
 
-predMap = createPredictionMap(output.model,p,d);
-viewMap(predMap.fitness, p, d) % View Prediction Map
+predMap = createPredictionMap(output.model,p,d,'featureRes',[50 50]);
+viewMap(predMap.fitness, d, predMap.edges) % View Prediction Map
 
 
 
