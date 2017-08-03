@@ -1,4 +1,4 @@
-function predMap = createPredictionMap(gpModels,p,d)
+function predMap = createPredictionMap(gpModels,p,d, varargin)
 %createPredictionMap - Produce prediction map from surrogate model
 %
 % Syntax:  predictionMap = createPredictionMap(gpModels,p,d)
@@ -18,8 +18,7 @@ function predMap = createPredictionMap(gpModels,p,d)
 %    p = sail;
 %    d = af_Domain;
 %    output = sail(d,p);
-%    d.featureRes = [50 50];
-%    predMap = createPredictionMap(output.model,p,d);
+%    predMap = createPredictionMap(output.model,p,d,'featureRes',[50 50]);
 %    viewMap(predMap.fitness,d, predMap.edges)
 %
 % Other m-files required: mapElites  nicheCompete updateMap d.createAcqFunction
@@ -29,9 +28,21 @@ function predMap = createPredictionMap(gpModels,p,d)
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (BRSU)
 % email: adam.gaier@h-brs.de
-% Jun 2017; Last revision: 01-Aug-2017
+% Jun 2017; Last revision: 03-Aug-2017
 
-% TODO: 'varargin' arguments to change hyperparameters below
+%------------- INPUT PARSING -----------
+parse = inputParser;
+parse.addRequired('gpModels');
+parse.addRequired('p');
+parse.addRequired('d');
+parse.addOptional('nChildren',p.nChildren);
+parse.addOptional('nGens',p.nGens);
+parse.addOptional('featureRes',d.featureRes);
+
+parse.parse(gpModels,p,d,varargin{:});
+p.nChildren  = parse.Results.nChildren;
+p.nGens      = parse.Results.nGens;
+d.featureRes = parse.Results.featureRes;
 
 %------------- BEGIN CODE --------------
 d.varCoef = 0; %no award for uncertainty
