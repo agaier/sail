@@ -41,7 +41,7 @@ p = sail;
 tic;
 %d = velo_Domain;
 d = af_Domain;
-output = sail(p,af_Domain);
+output = sail(p,d);
 disp(['Runtime: ' seconds2human(toc)]);
 
 %% Create Prediction Map from produced surrogate

@@ -1,41 +1,35 @@
-function GP_model = trainGP(input,output,p)
+function [GP_model] = trainGP(input,output,d, varargin)
 %trainGP - Trains Gaussian Process model
 % Given training input and output, optimizes given hyperParameters
 %
-% Syntax:  [output1,output2] = function_name(input1,input2,input3)
+% Syntax:  [output1,output2] = function_name(input1,output,gpParams)
 %
 % Inputs:
 %    input  - [samples X input dims]
 %    output - [samples X 1]
-%    p      - GP parameter struct
+%    d      - GP parameter struct
 %
-% Outputs:
-%    output1 - Description
-%    output2 - Description
-%
-% Example: 
-%    Line 1 of example
-%    Line 2 of example
-%    Line 3 of example
-%
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also: OTHER_FUNCTION_NAME1,  OTHER_FUNCTION_NAME2
 
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% May 2016; Last revision: 16-May-2016
+% May 2016; Last revision: 02-Aug-2016
+
+%------------- BEGIN INPUT PARSING --------------
+parse = inputParser;
+parse.addRequired('input');
+parse.addRequired('output');
+parse.addRequired('d');
+parse.addOptional('functionEvals',-d.functionEvals);
+
+parse.parse(input,output,d,varargin{:});
+functionEvals = parse.Results.functionEvals;
 
 %------------- BEGIN CODE --------------
-
-GP_model.hyp = minimize(p.hyp,@gp, -p.functionEvals, @infExact, p.meanfunc, ...
-               p.covfunc, p.likfunc, input, output);
+GP_model.hyp = minimize(d.hyp,@gp, -functionEvals, @infExact, d.meanfunc, ...
+               d.covfunc, d.likfunc, input, output);
 GP_model.trainInput = input;
 GP_model.trainOutput= output;
-GP_model.params     = p;
-
+GP_model.params     = d;
 
 %------------- END OF CODE --------------

@@ -23,6 +23,7 @@ p.nGens             = 500;
 p.nInitialSamples   = 50;
 p.nAdditionalSamples= 10;
 p.nTotalSamples     = 1000;
+p.trainingMod       = 3;
 
 % Display Parameters
 p.display.figs      = false;
