@@ -1,0 +1,9 @@
+# Gnuplot script file for plotting data from file "forceCoeffs.dat"
+set title "Convergence process"
+set xlabel "Iterations"
+set ylabel "Aerodynamics Coefficients"
+plot [ ][-0.2:0.8]\
+      "postProcessing/forceCoeffs1/0/forceCoeffs.dat" using 1:3 title 'Cd', \
+      "postProcessing/forceCoeffs1/0/forceCoeffs.dat" using 1:4 title 'Cl'
+pause mouse
+reread

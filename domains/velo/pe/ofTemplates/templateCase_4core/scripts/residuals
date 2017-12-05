@@ -1,0 +1,10 @@
+# Gnuplot script file for plotting data from file "log"
+set title "Convergence process"
+set xlabel "Iterations"
+set ylabel "Reziduals"
+set logscale y
+plot "< cat log | grep Ux | cut -d' ' -f9 | tr -d ','" title 'u', \
+     "< cat log | grep Uy | cut -d' ' -f9 | tr -d ','" title 'v', \
+     "< cat log | grep Uz | cut -d' ' -f9 | tr -d ','" title 'w' 
+pause 10 # pause mouse
+reread

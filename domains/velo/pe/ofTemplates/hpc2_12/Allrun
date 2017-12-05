@@ -1,0 +1,45 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+start=`date +%s`
+
+# copy motorbike surface from resources directory
+cp $FOAM_TUTORIALS/resources/geometry/motorBike.obj.gz constant/triSurface/
+runApplication surfaceFeatureExtract
+
+runApplication blockMesh
+
+runApplication decomposePar
+runParallel snappyHexMesh 12 -overwrite
+meshTime=`date +%s` 
+echo "$((meshTime-start))" >> mesh.timing
+
+#- For non-parallel running
+cp -r 0.org 0 > /dev/null 2>&1
+
+# #- For parallel running
+ls -d processor* | xargs -I {} rm -rf ./{}/0
+ls -d processor* | xargs -I {} cp -r 0.org ./{}/0
+
+cfdStart=`date +%s`
+
+runParallel patchSummary 12
+runParallel potentialFoam 12
+runParallel $(getApplication) 12
+
+cfdEnd=`date +%s` 
+echo "$((cfdEnd-cfdStart))" >> cfd.timing
+
+runApplication reconstructParMesh -constant
+runApplication reconstructPar -latestTime
+
+end=`date +%s`
+echo "$((end-start))" >> all.timing
+
+# Return results
+cp postProcessing/velo/0/forces.dat forces.dat
+
+
+# ----------------------------------------------------------------- end-of-file

@@ -20,7 +20,8 @@ function [fitness,predValue] = velo_AcquisitionFunc(drag,d)
 
 %------------- BEGIN CODE --------------
 
-fitness = -(drag(:,1)*d.muCoef - drag(:,2)*d.varCoef); % better fitness is higher fitness  
-predValue = drag(:,1);
+fitness = (drag(:,1)*d.muCoef) - (drag(:,2)*d.varCoef); % better fitness is lower fitness  
+predValue{1} = drag(:,1);
+predValue{2} = drag(:,2);
 
 %------------- END OF CODE --------------
