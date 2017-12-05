@@ -1,4 +1,4 @@
-function K = covMask(cov, hyp, x, z, i)
+function [K,dK] = covMask(cov, hyp, x, z)
 
 % Apply a covariance function to a subset of the dimensions only. The subset can
 % either be specified by a 0/1 mask by a boolean mask or by an index set.
@@ -6,10 +6,17 @@ function K = covMask(cov, hyp, x, z, i)
 % This function doesn't actually compute very much on its own, it merely does
 % some bookkeeping, and calls another covariance function to do the actual work.
 %
+% The function computes:
+%   k(x,z) = k0(x(mask),z(mask))
+% Example:
+%   k0  = {@covSEiso};
+%   msk = [1,3,7];
+%   k = {@covMask,{msk,k0{:}}};
+%
 % The function was suggested by Iain Murray, 2010-02-18 and is based on an
 % earlier implementation of his dating back to 2009-06-16.
 %
-% Copyright (c) by Carl Edward Rasmussen and Hannes Nickisch, 2012-11-17.
+% Copyright (c) by Carl Edward Rasmussen and Hannes Nickisch, 2016-11-14.
 %
 % See also COVFUNCTIONS.M.
 
@@ -28,28 +35,19 @@ if eval(nh_string)~=length(hyp)                          % check hyperparameters
   error('number of hyperparameters does not match size of masked data')
 end
 
-if nargin<5                                                        % covariances
-  if dg
-    K = feval(cov{:}, hyp, x(:,mask), 'diag');
-  else
-    if xeqz
-      K = feval(cov{:}, hyp, x(:,mask));
-    else
-      K = feval(cov{:}, hyp, x(:,mask), z(:,mask));
-    end
-  end
-else                                                               % derivatives
-  if i <= eval(nh_string)
-    if dg
-      K = feval(cov{:}, hyp, x(:,mask), 'diag', i);
-    else
-      if xeqz
-        K = feval(cov{:}, hyp, x(:,mask), [], i);
-      else
-        K = feval(cov{:}, hyp, x(:,mask), z(:,mask), i);
-      end
-    end
-  else
-    error('Unknown hyperparameter')
-  end
+xm = x(:,mask); if ~dg && ~xeqz, zm = z(:,mask); else zm = z; end
+if nargout>1
+  [K,dK] = feval(cov{:}, hyp, xm, zm);
+  dK = @(Q) dirder(Q,dK,x,mask);
+else
+  K = feval(cov{:}, hyp, xm, zm);
 end
+
+function [dhyp,dx] = dirder(Q,dK,x,mask)
+  if nargout>1
+    [dhyp,dxm] = dK(Q); n = size(x,1);
+    subs = [repmat((1:n)',length(mask),1), reshape(repmat(mask(:)',n,1),[],1)];
+    dx = accumarray(subs,dxm(:),size(x));
+  else
+    dhyp = dK(Q);
+  end

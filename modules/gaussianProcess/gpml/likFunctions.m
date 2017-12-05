@@ -12,12 +12,13 @@
 %   likT           (Student's t, regression)
 %
 %   likPoisson     (Poisson regression, count data)
+%   likNegBinom    (Negativ binomial regression, count data)
 %   likGamma       (Nonnegative regression, positive data)
 %   likExp         (Nonnegative regression, positive data)
 %   likInvGauss    (Nonnegative regression, positive data)
 %   likBeta        (Beta regression, interval data)
 %
-%   likMix         (Mixture of individual covariance functions)
+%   likMix         (Mixture of individual likelihood functions)
 %
 % The likelihood functions have three possible modes, the mode being selected
 % as follows (where "lik" stands for any likelihood function in "lik/lik*.m".):
@@ -99,5 +100,5 @@
 % See the help for the individual likelihood for the computations specific to
 % each likelihood function.
 %
-% Copyright (c) by Carl Edward Rasmussen and Hannes Nickisch, 2015-07-13.
+% Copyright (c) by Carl Edward Rasmussen and Hannes Nickisch, 2017-11-28.
 %                                      File automatically generated using noweb.
