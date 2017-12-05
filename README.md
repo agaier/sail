@@ -15,6 +15,7 @@ https://hal.inria.fr/hal-01518786/file/aiaa_sail.pdf
 
 Two domains are provided with parameterized and feed forward deformation encodings: 2D airfoils and 3D velomobile shells. To apply SAIL to a new domain only new representation and evaluation functions must be created. More sample domains will be madepublic as their are published. If you are interested in creating a new domain and having trouble, don't hesistate to ask!
 
+
 Produced using
 
     Matlab R2017b
