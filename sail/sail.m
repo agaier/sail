@@ -55,13 +55,13 @@ else
 end
 nSamples = size(observation,1);
 
-
 %% Acquisition Loop
+trainingTime = []; illumTime = []; peTime = []; predMap = [];
 while nSamples <= p.nTotalSamples
     %% 1 - Create Surrogate and Acquisition Function
     % Surrogate models are created from all evaluated samples, and these
     % models are used to produce an acquisition function.
-    disp(['PE ' int2str(nSamples) ' | Training Surrogate Models']);
+    disp(['PE ' int2str(nSamples) ' | Training Surrogate Models']); tstart = tic;
     parfor iModel = 1:size(value,2)
         % Only retrain model parameters every 'p.trainingMod' iterations
         if (nSamples==p.nInitialSamples || mod(nSamples,p.trainingMod*p.nAdditionalSamples))
@@ -71,81 +71,112 @@ while nSamples <= p.nTotalSamples
         end
     end
     
-    % Save found model parameters and new acquisition function
+    % Save found model parameters and update acquisition function
     for iModel=1:size(value,2); d.gpParams(iModel).hyp = gpModel{iModel}.hyp; end
     acqFunction = feval(d.createAcqFunction, gpModel, d);
+        
+    % -- Data Gathering -- %   
+    trainingTime = [trainingTime toc(tstart)];    
     
-    % After final model is created no more infill is necessary
-    if nSamples == p.nTotalSamples; break; end
-    
+    % Create intermediate prediction map for analysis
+    if ~mod(nSamples,p.data.mapEvalMod) && p.data.mapEval
+        disp(['PE: ' int2str(nSamples) '| Illuminating Prediction Map']);
+        [predMap(nSamples), ~] = ...
+            createPredictionMap(gpModel,observation,p,d,...
+            'featureRes', p.data.predMapRes, ...
+            'nGens'     , 2*p.nGens);
+    end
+
     %% 2 - Illuminate Acquisition Map
     % A map is constructed using the evaluated samples which are evaluated
     % with the acquisition function and placed in the map as the initial
     % population. The observed samples are the seed population of the
     % 'acquisition map' which is then created by optimizing the acquisition
     % function with MAP-Elites.
+    if nSamples == p.nTotalSamples; break; end  % After final model is created no more infill is necessary
+    disp(['PE: ' int2str(nSamples) '| Illuminating Acquisition Map']); tstart = tic;
     
-    % Evaluate data set with acquisition function
+    % Evaluate observation set with acquisition function
     [fitness,predValues] = acqFunction(observation);
     
-    % Place Best Samples in Map with Acquisition Fitness
+    % Place best samples in acquistion map with acquisition fitness
     obsMap = createMap(d.featureRes, d.dof, d.extraMapValues);
     [replaced, replacement] = nicheCompete(observation, fitness, obsMap, d);
     obsMap = updateMap(replaced,replacement,obsMap,fitness,observation,...
         predValues,d.extraMapValues);
     
     % Illuminate with MAP-Elites
-    disp(['PE: ' int2str(nSamples) '| Illuminating Acquisition Map']);
-    acqMap = mapElites(acqFunction,obsMap,p,d);
+    [acqMap, percImproved(:,nSamples)] = mapElites(acqFunction,obsMap,p,d);
     
-    %% 3 - Select Infill Samples
+    % -- Data Gathering -- % 
+    illumTime = [illumTime toc(tstart)];    
+    acqMapRecord(nSamples)     = acqMap;        
+    confContribution(nSamples) = nanmedian( (acqMap.confidence(:).*d.varCoef) ./ abs(acqMap.fitness(:)) );
+   
+    %% 3 - Select Infill Samples    
     % The next samples to be tested are chosen from the acquisition map: a
     % sobol sequence is used to to evenly sample the map in the feature
-    % dimensions. When evaluated solutions don't converge the next bin in
-    % the sobol set is chosen.
-    disp(['PE: ' int2str(nSamples) '| Evaluating New Samples']);
+    % dimensions. When evaluated solutions don't converge or the chosen bin
+    % is empty the next bin in the sobol set is chosen.
+    
+
+    disp(['PE: ' int2str(nSamples) '| Evaluating New Samples']); tstart = tic;
+ 
     % At first iteration initialize sobol sequence for sample selection
     if nSamples == p.nInitialSamples
         sobSet  = scramble(sobolset(d.nDims,'Skip',1e3),'MatousekAffineOwen');
         sobPoint= 1;
     end
     
-    newValue = nan(p.nAdditionalSamples, size(value,2)); % new values will be stored here
-    noValue = any(isnan(newValue),2);
-    
-    while any(any(noValue))
-        nNans = sum(noValue);
-        nextGenes = nan(nNans,d.dof); % Create one 'blank' genome for each NAN
-        
-        % Identify (grab indx of NANs)
-        nanIndx = 1:p.nAdditionalSamples;  nanIndx = nanIndx(noValue);
-        
-        % Replace with next in Sobol Sequence
-        newSampleRange = sobPoint:(sobPoint+nNans-1);
-        mapLinIndx = sobol2indx(sobSet,newSampleRange,d, acqMap.edges);
-        [chosenI,chosenJ] = ind2sub(d.featureRes, mapLinIndx);
-        for iGenes=1:nNans % Pull out chosen genomes from map
-            nextGenes(iGenes,:) = acqMap.genes(chosenI(iGenes),chosenJ(iGenes),:);
+    % Choose new samples and evaluate them for new observations
+    nMissing = p.nAdditionalSamples; newValue = []; newSample = [];
+    while nMissing > 0
+        % Evenly sample solutions from acquisition map
+        %newSampleRange      = sobPoint:(sobPoint+p.nAdditionalSamples*2)-1;
+        newSampleRange      = sobPoint:(sobPoint+p.nAdditionalSamples)-1;
+        [~, binIndx]        = sobol2indx(sobSet,newSampleRange, d, acqMap.edges);
+        for iGenes=1:size(binIndx,1)
+            indPool(iGenes,:) = acqMap.genes(binIndx(iGenes,1),binIndx(iGenes,2),:); % TODO: more than 2 dims
         end
+        % Remove repeats and nans (empty bins)
+        indPool = setdiff(indPool,observation,'rows','stable');
+        indPool = indPool(~any(isnan(indPool),2),:);
         
-        % Precise evaluation
-        measuredValue = feval(d.preciseEvaluate, nextGenes, d);
+        % Evaluate enough of these valid solutions to get your initial sample set
+        peFunction = @(x) feval(d.preciseEvaluate, x , d);    % returns nan if not converged
+        [foundSample, foundValue, nMissing] = getValidInds(indPool, peFunction, nMissing);
+        newSample = [newSample; foundSample]; %#ok<*AGROW>
+        newValue  = [newValue ; foundValue ]; %#ok<*AGROW>
         
-        % Assign found values
-        newValue(nanIndx,:) = measuredValue;
-        noValue = any(isnan(newValue),2);
-        nextObservation(nanIndx,:) = nextGenes;         %#ok<AGROW>
-        sobPoint = sobPoint + length(newSampleRange);   % Increment sobol sequence for next samples
+        % Advance sobol sequence
+        sobPoint = sobPoint + p.nAdditionalSamples + 1;
     end
     
-    % Add evaluated solutions to data set
-    value = cat(1,value,newValue);
-    observation = cat(1,observation,nextObservation);
-    nSamples  = size(observation,1);
+    % Assign found values
+    value       = cat(1,value,      newValue);
+    observation = cat(1,observation,newSample);
+    nSamples    = size(observation,1);
     
+    if length(observation) ~= length(unique(observation,'rows'));warning('Duplicate samples in observation set.'); end
+ 
+    % -- Data Gathering -- % 
+    peTime = [peTime toc(tstart)];    
 end % end acquisition loop
-output.p = p;
-output.model = gpModel;
+
+    %% Save relevant data
+    output.p            = p;
+    output.d            = d;
+    output.model        = gpModel;
+    output.trainTime    = trainingTime;
+    output.illum        = illumTime;
+    output.petime       = peTime;
+    output.percImproved = percImproved;
+    output.predMap      = predMap;
+    output.acqMap       = acqMapRecord;
+    output.confContrib  = confContribution;
+    output.unpack       = 'names = fieldnames(output); for i=1:length(names) eval( [names{i},''= output.'', names{i}, '';''] ); end';
+    
+    if p.data.outSave; save([p.data.outPath 'sailRun.mat'], 'output'); end
 end
 
 

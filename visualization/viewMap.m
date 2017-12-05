@@ -1,13 +1,11 @@
-function [figHandle, imageHandle] = viewMap(mapMatrix, d, edges, varargin)
+function [figHandle, imageHandle] = viewMap(mapMatrix, d, varargin)
 %computeFitness - Computes fitness with penalties from drag, lift, area
 %
-% Syntax:  viewMap(predMap.fitness, d, predMap.edges)
+% Syntax:  viewMap(predMap.fitness, d)
 %
 % Inputs:
 %   mapMatrix   - [RXC]  - scalar value in each bin (e.g. fitness)
 %   d           - struct - Domain definition
-%   edges       - {[1 X FeatureRes(1)+1], [1 X FeatureRes(2)+1]}
-%               - bin edges of feature space
 %
 % Outputs:
 %   figHandle   - handle of resulting figure
@@ -20,7 +18,7 @@ function [figHandle, imageHandle] = viewMap(mapMatrix, d, edges, varargin)
 %    output = sail(d,p);
 %    d.featureRes = [50 50];
 %    predMap = createPredictionMap(output.model,p,d);
-%    viewMap(predMap.fitness,d, predMap.edges)
+%    viewMap(predMap.fitness,d)
 %
 % Other m-files required: none
 % Subfunctions: none
@@ -31,19 +29,25 @@ function [figHandle, imageHandle] = viewMap(mapMatrix, d, edges, varargin)
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Jun 2016; Last revision: 02-Aug-2017
+% Jun 2016; Last revision: 20-Aug-2017
 
 %------------- BEGIN CODE --------------
-
-% For nicer publishing
-if isempty(varargin);  yOffset = [0.5 -0.0 0];
-else                   yOffset = varargin{1};
+mapRes = size(mapMatrix);
+for i=1:length(mapRes)
+    edges{i} = linspace(0,1,mapRes(i)+1); %#ok<AGROW>
 end
 
-imgHandle = imagesc(flip(mapMatrix)); fitPlot = gca;
+yOffset = [0.5 -0.0 0];
+    imgHandle = imagesc(flipud(rot90(mapMatrix))); fitPlot = gca;
+if nargin > 3
+    if strcmp(varargin{1},'flip')
+    imgHandle = imagesc(fliplr(rot90(rot90(mapMatrix)))); fitPlot = gca;
+    end
+end
+
 set(imgHandle,'AlphaData',~isnan(imgHandle.CData)*1)
 xlab = xlabel([d.featureLabels{1} '\rightarrow']);
-ylab = ylabel(['\uparrow' d.featureLabels{2} ]);
+ylab = ylabel(['\downarrow' d.featureLabels{2} ]);
 set(ylab,'Rotation',0,'Position',get(ylab,'Position')-yOffset)
 
 

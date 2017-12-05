@@ -1,4 +1,4 @@
-function [replaced, replacement] = nicheCompete(newInds,fitness,map,d)
+function [replaced, replacement, mapLinIndx] = nicheCompete(newInds,fitness,map,d)
 %nicheCompete - results of competition with map's existing elites
 %
 % Syntax:  [replaced, replacement] = nicheCompete(newInds,fitness,map,p)
@@ -12,6 +12,7 @@ function [replaced, replacement] = nicheCompete(newInds,fitness,map,d)
 % Outputs:
 %   replaced    - [NX1] - Linear index of map cells to recieve replacements
 %   replacement - [NX1] - Index of newInds to replace current elites in niche
+%   mapLinIndx  - [NX1] - Index of current elites (for rank testing only)
 %
 % Example:
 %
@@ -28,8 +29,13 @@ function [replaced, replacement] = nicheCompete(newInds,fitness,map,d)
 [bestIndex, bestBin] = getBestPerCell(newInds,fitness,d, map.edges);
 mapLinIndx = sub2ind(d.featureRes,bestBin(:,1),bestBin(:,2));
 
+% Nan features?
+% A 'nan' genome sneaks in -- apparently after precise evaluation
+if any(isnan(mapLinIndx));   save('nanFeatureError'); end
+
+
 % Compare to already existing samples
-improvement = ~(fitness (bestIndex) >= map.fitness(mapLinIndx)); % comparisons to NaN are always false
+improvement  = ~(fitness (bestIndex) >= map.fitness(mapLinIndx)); % comparisons to NaN are always false
 improvement(isnan(fitness(bestIndex))) = false;
 replacement = bestIndex (improvement);
 replaced    = mapLinIndx(improvement);

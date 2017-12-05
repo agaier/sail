@@ -19,6 +19,8 @@ https://hal.inria.fr/hal-01518786/file/aiaa_sail.pdf
      public as their are published. If you are interested in creating a new
      domain and having trouble, don't hesistate to ask!
 
+     A third domain is now included airfoils created with free form deformations.
+
 Produced using
     Matlab Version: 9.1.0.441655 (R2016b)
 

@@ -15,15 +15,15 @@ function p = defaultParamSet()
 %------------- BEGIN CODE --------------
 
 % MAP-Elites Parameters
-p.nChildren         = 250; 
+p.nChildren         = 2^7; 
 p.mutSigma          = 0.1; 
-p.nGens             = 500;
+p.nGens             = 2^8;
 
 % Infill Parameters
 p.nInitialSamples   = 50;
 p.nAdditionalSamples= 10;
 p.nTotalSamples     = 1000;
-p.trainingMod       = 3;
+p.trainingMod       = 2;
 
 % Display Parameters
 p.display.figs      = false;
@@ -33,7 +33,7 @@ p.display.illuMod   = p.nGens;
 
 % Data Gathering Parameters
 p.data.outSave      = true;
-p.data.outMod       = 10;
+p.data.outMod       = 50;
 p.data.mapEval      = false;
 p.data.mapEvalMod   = p.nTotalSamples;
 p.data.outPath      = '';

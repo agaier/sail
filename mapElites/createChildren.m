@@ -1,18 +1,17 @@
-function children = createChildren(map, p, d)
+function children = createChildren(map, nChildren, p, d)
 %createChildren - produce new children through mutation of map elite
 %
-% Syntax:  children = createChildren(map,p)
+% Syntax:  children = createChildren(map,nChildren,p,d)
 %
 % Inputs:
-%   map - Population struct
+%   map         - Population struct
 %    .fitness
 %    .genes
-%    .<additional info> (e.g., drag, lift, etc)
-%   p   - SAIL hyperparameter struct
-%    .nChildren - number of children created
-%    .mutSigma  - sigma of gaussian mutation applied to children
-%   d   - Domain description struct
-%    .dof       - Degrees of freedom (genome length)
+%   nChildren - number of children to create
+%   p           - SAIL hyperparameter struct
+%    .mutSigma      - sigma of gaussian mutation applied to children
+%   d           - Domain description struct
+%    .dof           - Degrees of freedom (genome length)
 %
 % Outputs:
 %   children - [nChildren X genomeLength] - new solutions
@@ -22,7 +21,7 @@ function children = createChildren(map, p, d)
 % Author: Adam Gaier
 % Bonn-Rhein-Sieg University of Applied Sciences (HBRS)
 % email: adam.gaier@h-brs.de
-% Jun 2016; Last revision: 01-Aug-2017
+% Jun 2016; Last revision: 17-Oct-2017
 
 %------------- BEGIN CODE --------------  
     % Remove empty bins from parent pool
@@ -30,8 +29,8 @@ function children = createChildren(map, p, d)
     parentPool(isnan(parentPool(:,1)),:) = []; 
     
     % Choose parents and create mutation
-    parents = parentPool(randi([1 size(parentPool,1)], [p.nChildren 1]), :);
-    mutation = randn(p.nChildren,d.dof) .* p.mutSigma;
+    parents = parentPool(randi([1 size(parentPool,1)], [nChildren 1]), :);
+    mutation = randn(nChildren,d.dof) .* p.mutSigma;
     
     % Apply mutation
     children = parents + mutation;
