@@ -31,7 +31,8 @@ value = nan(nObs,1);
 for iRound=0:nRounds-1
     PEValue = nan(nCases,1);
     % Evaluate as many samples as you have cases in a batch
-    parfor iCase = 1:nCases
+    %par
+    for iCase = 1:nCases
         obsIndx = iRound*nCases+iCase;          
         if obsIndx <= nObs
             openFoamFolder = [folderBaseName 'case' int2str(iCase+caseStart-1) '/']

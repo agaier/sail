@@ -105,7 +105,7 @@ d.nVals = 1; % # of values of interest, e.g. dragForce (1), or cD and cL (2)
 
 % Cluster
 % % Cases are executed and stored here (cases are started elsewhere)
- d.openFoamFolder = ['/scratch/agaier2m/sailCFD/']; 
+% d.openFoamFolder = ['/scratch/agaier2m/sailCFD/']; 
 % - There should be a folder called 'case1, case2, ..., caseN in this
 % folder, where N is the number of new samples added every iteration.
 % - Each folder has a shell script called 'caserunner.sh' which must be
@@ -114,17 +114,16 @@ d.nVals = 1; % # of values of interest, e.g. dragForce (1), or cD and cL (2)
 
 %% Local
 % TODO: make script that creates folders and runs caserunners
-%d.openFoamTemplate = ['~/Code/ffdSail/domains/' d.name '/pe/templateCase_4core'];
+d.openFoamTemplate = ['~/Code/sail/domains/velo/pe/ofTemplates/1coreCase'];
 %
 %% Cases are executed and stored here
-%d.openFoamFolder = ['~/Code/ffdSail/domains/' d.name '/pe/'];
-%
-%for iCase = 1:d.nCases
-%    system(['cp -r ' d.openFoamTemplate ' ' d.openFoamFolder 'case' int2str(iCase)]); 
-%    %system(['(cd ' d.openFoamFolder 'case' int2str(iCase) '; ./caseRunner.sh &)']); 
-%end
-%
-%system(['(cd ' d.openFoamFolder ' && ./startCaseRunners.sh)']);
+d.openFoamFolder = ['~/Code/sail/domains/velo/pe/cases/'];
+
+for iCase = 1:d.nCases
+   system(['cp -r ' d.openFoamTemplate ' ' d.openFoamFolder 'case' int2str(iCase)]); 
+   system(['(cd ' d.openFoamFolder 'case' int2str(iCase) '; ./caseRunner.sh &)']); 
+end
+
 
 % %------------- END OF CODE --------------
 
