@@ -115,6 +115,7 @@ d.nVals = 1; % # of values of interest, e.g. dragForce (1), or cD and cL (2)
 %% Local
 % TODO: make script that creates folders and runs caserunners
 d.openFoamTemplate = ['~/Code/sail/domains/velo/pe/ofTemplates/1coreCase'];
+%d.openFoamTemplate = ['~/Code/sail/domains/velo/pe/ofTemplates/templateCase_4core'];
 %
 %% Cases are executed and stored here
 d.openFoamFolder = ['~/Code/sail/domains/velo/pe/cases/'];

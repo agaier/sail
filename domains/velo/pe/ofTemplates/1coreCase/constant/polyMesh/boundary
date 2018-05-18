@@ -21,32 +21,32 @@ FoamFile
     {
         type            patch;
         nFaces          320;
-        startFace       400912;
+        startFace       397445;
     }
     inlet
     {
         type            patch;
         nFaces          64;
-        startFace       401232;
+        startFace       397765;
     }
     outlet
     {
         type            patch;
         nFaces          64;
-        startFace       401296;
+        startFace       397829;
     }
     lowerWall
     {
         type            wall;
         inGroups        1(wall);
         nFaces          3220;
-        startFace       401360;
+        startFace       397893;
     }
     upperWall
     {
         type            patch;
         nFaces          160;
-        startFace       404580;
+        startFace       401113;
     }
     parsecWing
     {
@@ -58,8 +58,8 @@ parsecWingGroup
 wall
 )
 ;
-        nFaces          40417;
-        startFace       404740;
+        nFaces          39964;
+        startFace       401273;
     }
 )
 

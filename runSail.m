@@ -31,7 +31,7 @@ p = sail;  % load default hyperparameters
  p.nInitialSamples   = 5;
  p.nTotalSamples     = 25;        
  p.nChildren         = 50;
- p.nGens             = 500; 
+ p.nGens             = 200; 
  
  p.data.mapEval      = false;   % produce intermediate prediction maps?
  p.data.mapEvalMod   = 50;      % how often? (in samples)     

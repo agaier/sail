@@ -11,29 +11,36 @@ runApplication surfaceFeatureExtract
 
 runApplication blockMesh
 
-runApplication decomposePar
-runParallel snappyHexMesh 1 -overwrite
+#runApplication decomposePar
+#runParallel snappyHexMesh 1 -overwrite
+runApplication snappyHexMesh -overwrite
+
 meshTime=`date +%s` 
 echo "$((meshTime-start))" >> mesh.timing
 
 #- For non-parallel running
-cp -r 0.org 0 > /dev/null 2>&1
+cp -r 0.org/* 0  > /dev/null 2>&1
 
 # #- For parallel running
-ls -d processor* | xargs -I {} rm -rf ./{}/0
-ls -d processor* | xargs -I {} cp -r 0.org ./{}/0
+#ls -d processor* | xargs -I {} rm -rf ./{}/0
+#ls -d processor* | xargs -I {} cp -r 0.org ./{}/0
 
 cfdStart=`date +%s`
 
-runParallel patchSummary 1
-runParallel potentialFoam 1
-runParallel $(getApplication) 1
+#runParallel patchSummary 1
+#runParallel potentialFoam 1
+#runParallel $(getApplication) 1
+
+runApplication patchSummary 
+runApplication potentialFoam 
+runApplication $(getApplication) 
+
 
 cfdEnd=`date +%s` 
 echo "$((cfdEnd-cfdStart))" >> cfd.timing
 
-runApplication reconstructParMesh -constant
-runApplication reconstructPar -latestTime
+#runApplication reconstructParMesh -constant
+#runApplication reconstructPar -latestTime
 
 end=`date +%s`
 echo "$((end-start))" >> all.timing
