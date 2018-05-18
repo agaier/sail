@@ -1,4 +1,4 @@
-function [map, percImproved, h] = mapElites(fitnessFunction,map,p,d)
+function [map, percImproved, h, evalTime] = mapElites(fitnessFunction,map,p,d)
 %mapElites - Multi-dimensional Archive of Phenotypic Elites algorithm
 %
 % Syntax:  map = mapElites(fitnessFunction, map, p, d);
@@ -34,6 +34,7 @@ if p.display.illu
 end
 
 %% MAP-Elites
+evalTime = 0;
 iGen = 1;
 while (iGen <= p.nGens)
     %% 1) Create and Evaluate Children
@@ -47,7 +48,9 @@ while (iGen <= p.nGens)
         children = [children; validChildren]; %#ok<AGROW>
     end   
     
+    evalStart = tic;
     [fitness, values] = fitnessFunction(children); %% TODO: Speed up without anonymous functions
+    evalTime = evalTime + toc(evalStart);    
 
     %% 2) Add Children to Map   
     [replaced, replacement] = nicheCompete(children,fitness,map,d);  

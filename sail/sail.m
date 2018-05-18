@@ -44,7 +44,10 @@ function [output] = sail(p,d)
 
 if nargin==0; output = defaultParamSet; return; end
 
+% Create initial
+trainingTime = []; predTime = [0]; illumTime = [0]; peTime = []; predMap = [];
 %% 0 - Produce Initial Samples
+peStart = tic;
 if ~d.loadInitialSamples
     [observation, value] = initialSampling(d,p.nInitialSamples);
 else
@@ -55,13 +58,16 @@ else
 end
 nSamples = size(observation,1);
 
+% -- Data Gathering -- %   
+peTime = [peTime toc(peStart)];    
+
 %% Acquisition Loop
-trainingTime = []; illumTime = []; peTime = []; predMap = [];
 while nSamples <= p.nTotalSamples
     %% 1 - Create Surrogate and Acquisition Function
     % Surrogate models are created from all evaluated samples, and these
     % models are used to produce an acquisition function.
-    disp(['PE ' int2str(nSamples) ' | Training Surrogate Models']); tstart = tic;
+    disp(['PE ' int2str(nSamples) ' | Training Surrogate Models']); 
+    trainStart = tic;
     parfor iModel = 1:size(value,2)
         % Only retrain model parameters every 'p.trainingMod' iterations
         if (nSamples==p.nInitialSamples || mod(nSamples,p.trainingMod*p.nAdditionalSamples))
@@ -71,13 +77,13 @@ while nSamples <= p.nTotalSamples
         end
     end
     
+    % -- Data Gathering -- %
+    trainingTime = [trainingTime toc(trainStart)];    
+    
     % Save found model parameters and update acquisition function
     for iModel=1:size(value,2); d.gpParams(iModel).hyp = gpModel{iModel}.hyp; end
     acqFunction = feval(d.createAcqFunction, gpModel, d);
-        
-    % -- Data Gathering -- %   
-    trainingTime = [trainingTime toc(tstart)];    
-    
+           
     % Create intermediate prediction map for analysis
     if ~mod(nSamples,p.data.mapEvalMod) && p.data.mapEval
         disp(['PE: ' int2str(nSamples) '| Illuminating Prediction Map']);
@@ -87,6 +93,9 @@ while nSamples <= p.nTotalSamples
             'nGens'     , 2*p.nGens);
     end
 
+    % No reason for further illumination if we have reached our budget
+    if nSamples >= p.nTotalSamples; break; end
+    
     %% 2 - Illuminate Acquisition Map
     % A map is constructed using the evaluated samples which are evaluated
     % with the acquisition function and placed in the map as the initial
@@ -94,7 +103,8 @@ while nSamples <= p.nTotalSamples
     % 'acquisition map' which is then created by optimizing the acquisition
     % function with MAP-Elites.
     if nSamples == p.nTotalSamples; break; end  % After final model is created no more infill is necessary
-    disp(['PE: ' int2str(nSamples) '| Illuminating Acquisition Map']); tstart = tic;
+    disp(['PE: ' int2str(nSamples) '| Illuminating Acquisition Map']);
+    illumStart = tic;
     
     % Evaluate observation set with acquisition function
     [fitness,predValues] = acqFunction(observation);
@@ -106,10 +116,11 @@ while nSamples <= p.nTotalSamples
         predValues,d.extraMapValues);
     
     % Illuminate with MAP-Elites
-    [acqMap, percImproved(:,nSamples)] = mapElites(acqFunction,obsMap,p,d);
+    [acqMap, percImproved(:,nSamples),~,predictTime] = mapElites(acqFunction,obsMap,p,d);
     
     % -- Data Gathering -- % 
-    illumTime = [illumTime toc(tstart)];    
+    predTime  = [predTime predictTime]; % Doesn't include categorization, etc.
+    illumTime = [illumTime toc(illumStart)];    
     acqMapRecord(nSamples)     = acqMap;        
     confContribution(nSamples) = nanmedian( (acqMap.confidence(:).*d.varCoef) ./ abs(acqMap.fitness(:)) );
    
@@ -118,9 +129,8 @@ while nSamples <= p.nTotalSamples
     % sobol sequence is used to to evenly sample the map in the feature
     % dimensions. When evaluated solutions don't converge or the chosen bin
     % is empty the next bin in the sobol set is chosen.
-    
-
-    disp(['PE: ' int2str(nSamples) '| Evaluating New Samples']); tstart = tic;
+    disp(['PE: ' int2str(nSamples) '| Evaluating New Samples']); 
+    peStart = tic;
  
     % At first iteration initialize sobol sequence for sample selection
     if nSamples == p.nInitialSamples
@@ -160,7 +170,7 @@ while nSamples <= p.nTotalSamples
     if length(observation) ~= length(unique(observation,'rows'));warning('Duplicate samples in observation set.'); end
  
     % -- Data Gathering -- % 
-    peTime = [peTime toc(tstart)];    
+    peTime = [peTime toc(peStart)];    
 end % end acquisition loop
 
     %% Save relevant data
@@ -168,8 +178,9 @@ end % end acquisition loop
     output.d            = d;
     output.model        = gpModel;
     output.trainTime    = trainingTime;
-    output.illum        = illumTime;
-    output.petime       = peTime;
+    output.predictTime  = predTime;
+    output.illumTime    = illumTime;
+    output.peTime       = peTime;
     output.percImproved = percImproved;
     output.predMap      = predMap;
     output.acqMap       = acqMapRecord;
