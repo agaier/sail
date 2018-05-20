@@ -171,6 +171,12 @@ while nSamples <= p.nTotalSamples
  
     % -- Data Gathering -- % 
     peTime = [peTime toc(peStart)];    
+    
+    output.trainTime    = trainingTime;
+    output.predictTime  = predTime;
+    output.illumTime    = illumTime;
+    output.peTime       = peTime;
+    save([p.data.outPath 'sailRun.mat'], 'output');
 end % end acquisition loop
 
     %% Save relevant data

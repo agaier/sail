@@ -28,8 +28,8 @@ addpath(genpath(currentPath(1:end-length(mfilename))));
 p = sail;  % load default hyperparameters
 
 % Edit Hyperparameters
- p.nInitialSamples   = 5;
- p.nTotalSamples     = 25;        
+ p.nInitialSamples   = 200;
+ p.nTotalSamples     = 1000;        
  p.nChildren         = 50;
  p.nGens             = 200; 
  
@@ -42,9 +42,8 @@ p = sail;  % load default hyperparameters
 d = velo_Domain('encoding','ffd');% d.preciseEvaluate = 'velo_DummyPreciseEvaluate';
 
 %% Timing Settings
-%parpool(1);        % No parallelism
+parpool(1);        % No parallelism
 p.trainingMod = 1;  % Retrain model every iteration
-
 
 
 %% Run SAIL

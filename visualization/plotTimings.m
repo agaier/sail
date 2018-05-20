@@ -14,7 +14,7 @@ h = area(cumsum(Y));
 h(1).FaceColor = [0 0.25 0.25];
 h(2).FaceColor = [0 0.5 0.5];
 h(3).FaceColor = [0 0.75 0.75];
-legend('Precise Evaluation\times10','Model Training\times2','Prediction \times10,000',...
+legend('Precise Evaluation\times10','Model Training\times2','Prediction \times25000',...
         'Location','SouthOutside','Orientation','horizontal')
 
 ylabel('Seconds');xlabel('Precise Evaluations')
