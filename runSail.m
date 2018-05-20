@@ -28,8 +28,8 @@ addpath(genpath(currentPath(1:end-length(mfilename))));
 p = sail;  % load default hyperparameters
 
 % Edit Hyperparameters
- p.nInitialSamples   = 200;
- p.nTotalSamples     = 1000;        
+ p.nInitialSamples   = 20;
+ p.nTotalSamples     = 40;        
  p.nChildren         = 50;
  p.nGens             = 200; 
  
@@ -37,9 +37,9 @@ p = sail;  % load default hyperparameters
  p.data.mapEvalMod   = 50;      % how often? (in samples)     
  
 % Domain
-%d = parsec_Domain;
+d = parsec_Domain;
 %d = ffdFoil_Domain;
-d = velo_Domain('encoding','ffd');% d.preciseEvaluate = 'velo_DummyPreciseEvaluate';
+%d = velo_Domain('encoding','ffd');% d.preciseEvaluate = 'velo_DummyPreciseEvaluate';
 
 %% Timing Settings
 parpool(1);        % No parallelism
@@ -50,7 +50,7 @@ p.trainingMod = 1;  % Retrain model every iteration
 runTime = tic;
 output = sail(p,d);
 disp(['Runtime: ' seconds2human(toc(runTime))]);
-save('~/Code/sail/veloOut.mat',output);
+save('~/Code/sail/xOut.mat',output);
 
 %% Create New Prediction Map from produced surrogate
 % 
