@@ -28,8 +28,8 @@ addpath(genpath(currentPath(1:end-length(mfilename))));
 p = sail;  % load default hyperparameters
 
 % Edit Hyperparameters
- p.nInitialSamples   = 20;
- p.nTotalSamples     = 40;        
+ p.nInitialSamples   = 50;
+ p.nTotalSamples     = 1000;        
  p.nChildren         = 50;
  p.nGens             = 200; 
  
@@ -50,7 +50,7 @@ p.trainingMod = 1;  % Retrain model every iteration
 runTime = tic;
 output = sail(p,d);
 disp(['Runtime: ' seconds2human(toc(runTime))]);
-save('~/Code/sail/xOut.mat',output);
+save('~/Code/sail/xOut.mat','output');
 
 %% Create New Prediction Map from produced surrogate
 % 
