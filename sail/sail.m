@@ -70,7 +70,7 @@ while nSamples <= p.nTotalSamples
     trainStart = tic;
     parfor iModel = 1:size(value,2)
         % Only retrain model parameters every 'p.trainingMod' iterations
-        if (nSamples==p.nInitialSamples || mod(nSamples,p.trainingMod*p.nAdditionalSamples))
+        if (nSamples==p.nInitialSamples || ~mod(nSamples,p.trainingMod*p.nAdditionalSamples))
             gpModel{iModel} = trainGP(observation, value(:,iModel), d.gpParams(iModel));
         else
             gpModel{iModel} = trainGP(observation, value(:,iModel), d.gpParams(iModel),'functionEvals',0);
