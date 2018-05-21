@@ -3,17 +3,19 @@
 
 
 tTime = output.trainTime(2:end); tTime(32) = mean([tTime(31) tTime(33)]);
+tTime = tTime.*10; % TMP::accidentally didn't retrain model every time...
+
 pTime = output.predictTime(2:end);
 eTime = output.peTime(2:end);
 
 
 % 1 Gen
-
     % Single Prediction
     Y(:,1) = smooth((pTime./10000));
 
     % Model Training
     Y(:,2) = smooth(tTime,30);
+    Y(end,2) = tTime(end-1);
 
     % Illumination
     Y(:,3) = smooth(pTime,30);
@@ -30,15 +32,19 @@ xScale = 210:10:1000;
 figure(1)
 yyaxis left;
     h1 = plot(xScale,Y(:,2));
+    ylabel('Seconds');
+
 yyaxis right;
     h2 = plot(xScale,Y(:,3));
     
 h1.LineWidth = 3; h2.LineWidth = 3;
-title('Computation Time by Number of Sample');
+title('Computation Time at Each Iteration');
 legend('Model Training', 'Illumination (Prediction\times10,000)',...
         'Location','SouthOutside','Orientation','horizontal');
 grid on
 set(gca,'FontSize',18); grid on;
+xlabel('Precise Evaluations');
+ylabel('Seconds');
 
 % h=plot(200:10:990,Y,'LineWidth',3);
 % set(gca,'YScale','log');
@@ -68,6 +74,8 @@ for i=1:length(h)
     text(h(i).XData(end)+5,h(i).YData(end),seconds2human(h(i).YData(end)))
 end
 
+xlabel('Precise Evaluations');
+ylabel('Seconds');
 
 % % Matrix form
 % %Y = [tTime; eTime; pTime]';
