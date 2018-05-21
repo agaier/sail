@@ -29,15 +29,17 @@ eTime = output.peTime(2:end);
  
 % Figures
 xScale = 210:10:1000;
-figure(1)
-yyaxis left;
-    h1 = plot(xScale,Y(:,2));
-    ylabel('Seconds');
+figure(1); clf;
+ area(Y(:,[2 3])) % Are they same order of magnitude?
 
-yyaxis right;
-    h2 = plot(xScale,Y(:,3));
-    
-h1.LineWidth = 3; h2.LineWidth = 3;
+% yyaxis left;
+%     h1 = plot(xScale,Y(:,2));
+%     ylabel('Seconds');
+%     
+% yyaxis right;
+%     h2 = plot(xScale,Y(:,3)); hold on;
+% h1.LineWidth = 3; h2.LineWidth = 3;
+
 title('Computation Time at Each Iteration');
 legend('Model Training', 'Illumination (Prediction\times10,000)',...
         'Location','SouthOutside','Orientation','horizontal');
