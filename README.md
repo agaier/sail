@@ -1,9 +1,14 @@
 # sail
+
+<p align="center">
+  <img width="125%" src="img/velo.png">
+</p>
+
 Source code for the Surrogate-Assisted Illumination (SAIL) algorithm, as
 described in: 
 
 "Data-Efficient Design Exploration through Surrogate-Assisted Illumination"
-to be published in Evolutionary Computation.
+published in Evolutionary Computation.
 https://arxiv.org/abs/1806.05865
 
 "Data-Efficient Exploration, Optimization, and Modeling of Diverse Designs
